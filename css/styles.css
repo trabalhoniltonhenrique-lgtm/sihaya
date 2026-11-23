@@ -103,16 +103,6 @@ header {
   color: #6e3eb3;
   box-shadow: 0 2px 10px #563b7920;
 }
-.summary {
-  padding: 17px;
-  margin-bottom: 15px;
-}
-.summary-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
 .small {
   font-size: 13px;
   color: var(--sub);
@@ -1911,4 +1901,83 @@ main[hidden],
 }
 .exercise-group .list .exercise {
   box-shadow: none;
+}
+
+/* Barra fixa: progresso + cronômetro ficam visíveis durante o treino */
+.workout-bar {
+  position: sticky;
+  top: calc(env(safe-area-inset-top) + 8px);
+  z-index: 20;
+  padding: 11px 14px 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 10px 26px var(--shadow, rgba(71, 43, 101, 0.12));
+}
+.wb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.wb-progress {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.wb-progress .pct {
+  font-size: 22px;
+}
+.wb-timer.timer {
+  flex: 1 1 auto;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+@media (min-width: 560px) {
+  .wb-timer.timer {
+    flex: 0 1 auto;
+  }
+}
+.wb-timer .clock {
+  font-size: 24px;
+}
+.wb-timer .timer-actions {
+  flex-wrap: nowrap;
+}
+.wb-timer button {
+  min-height: 36px;
+  padding: 7px 11px;
+}
+.workout-bar .track {
+  height: 6px;
+  margin-top: 10px;
+}
+
+/* Títulos de grupo na tela de treino e dica nos títulos das seções */
+.screen-group {
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin: 30px 4px 0;
+}
+.toggle-hint {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  color: var(--sub);
+}
+.symptoms-feature .symptom-col {
+  margin-top: 4px;
+}
+.actions + .note {
+  margin-bottom: 4px;
+}
+/* Rolagens automáticas não param escondidas sob a barra fixa */
+html {
+  scroll-padding-top: 140px;
 }

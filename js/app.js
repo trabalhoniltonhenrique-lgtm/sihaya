@@ -920,6 +920,8 @@
     const box = $('exerciseOptions');
     box.replaceChildren();
     const session = current();
+    $('customDayName').textContent =
+      weekNames[day] + ' · ' + (session.workoutName || app.dayTitles[day] || 'Treino');
     session.exercises.forEach((ex) => {
       const row = document.createElement('div');
       row.className = 'exercise-config';
@@ -1112,15 +1114,21 @@
           save();
           renderCalendar();
           if (!$('analysisBody').hidden) renderSymptomAnalysis();
-          $('symptomsStatus').textContent =
-            'Atualizado para ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.';
+          symptomsStatus(
+            'Atualizado para ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.',
+          );
         });
         row.append(lbl, sel);
         box.append(row);
       }
     }
-    $('symptomsStatus').textContent =
-      'Registro da sessão de ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.';
+    symptomsStatus(
+      'Registro da sessão de ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.',
+    );
+  }
+  // Os sintomas ficam em duas seções (antes e depois); ambas mostram o status.
+  function symptomsStatus(text) {
+    document.querySelectorAll('[data-symptoms-status]').forEach((el) => (el.textContent = text));
   }
   function numberLoad(value) {
     const raw = String(value || '')
@@ -1285,7 +1293,8 @@
     'rest',
     'calendar',
     'history',
-    'symptoms',
+    'symBefore',
+    'symAfter',
   ]) {
     $(id + 'Toggle').addEventListener('click', () => {
       const btn = $(id + 'Toggle'),
@@ -1296,7 +1305,7 @@
       if (!expanded) {
         if (id === 'calendar') renderCalendar();
         if (id === 'history') renderChart();
-        if (id === 'symptoms') renderSymptoms();
+        if (id === 'symBefore' || id === 'symAfter') renderSymptoms();
         if (id === 'custom' || id === 'rest') renderConfig();
         if (id === 'days') renderDayOptions();
         if (id === 'appearance') renderAppearance();

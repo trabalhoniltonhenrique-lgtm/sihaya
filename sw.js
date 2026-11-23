@@ -1,5 +1,5 @@
 // Troque o nome do cache ao publicar uma nova versão para limpar caches antigos.
-const CACHE = 'sihaya-app-v2-4';
+const CACHE = 'sihaya-app-v2-5';
 const FILES = [
   './',
   './index.html',

@@ -52,39 +52,24 @@
         <p class="intro" id="workoutIntro">Adaptação · 6 exercícios · 12 séries</p>
       </header>
       <nav class="switch" id="daySwitch" aria-label="Dias de treino"></nav>
-      <div class="manage-row day-manage">
-        <span class="small" id="daySummary">Organize sua semana.</span
-        ><button class="manage-btn" id="addDay" type="button">+ Adicionar dia</button>
-      </div>
-      <section class="panel feature days-feature">
-        <button
-          type="button"
-          class="section-toggle"
-          id="daysToggle"
-          aria-expanded="false"
-          aria-controls="daysBody"
-        >
-          Gerenciar dias <span class="chevron">⌄</span>
-        </button>
-        <div class="feature-body" id="daysBody" hidden>
-          <p class="feature-description">
-            Altere o nome, duplique a programação ou exclua um dia. Os treinos de datas anteriores
-            permanecem no histórico.
-          </p>
-          <div class="day-options" id="dayOptions"></div>
-        </div>
-      </section>
       <div class="panel sessionbar">
         <label for="sessionDate">Data da sessão</label
         ><input class="date-input" type="date" id="sessionDate" aria-label="Data do treino" />
       </div>
-      <section class="panel summary" aria-label="Progresso">
-        <div class="summary-top">
-          <div>
-            <strong>Progresso do treino</strong>
-            <div class="small" id="progressText">0 de 12 séries concluídas</div>
+      <section class="panel workout-bar" aria-label="Progresso e descanso">
+        <div class="wb-row">
+          <div class="wb-progress">
+            <span class="pct" id="progressPct">0%</span>
+            <span class="small" id="progressText">0 de 12 séries concluídas</span>
           </div>
-          <span class="pct" id="progressPct">0%</span>
+          <div class="wb-timer timer" role="group" aria-label="Cronômetro de descanso">
+            <div id="clock" class="clock" role="timer" aria-label="Descanso entre séries">01:00</div>
+            <div class="timer-actions">
+              <button type="button" id="t60" class="primary">60 s</button
+              ><button type="button" id="t90">90 s</button
+              ><button type="button" id="pause">Pausar</button>
+            </div>
+          </div>
         </div>
         <div
           class="track"
@@ -98,15 +83,21 @@
           <div class="bar" id="fill"></div>
         </div>
       </section>
-      <section class="panel timer" aria-label="Cronômetro de descanso">
-        <div>
-          <div class="small">Descanso entre séries</div>
-          <div id="clock" class="clock" role="timer">01:00</div>
-        </div>
-        <div class="timer-actions">
-          <button type="button" id="t60" class="primary">60 s</button
-          ><button type="button" id="t90">90 s</button
-          ><button type="button" id="pause">Pausar</button>
+      <section class="panel feature symptoms-feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="symBeforeToggle"
+          aria-expanded="false"
+          aria-controls="symBeforeBody"
+        >
+          <span class="toggle-label">Como você está? <span class="toggle-hint">antes do treino</span></span>
+          <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="symBeforeBody" hidden>
+          <p class="feature-description">Registre antes de começar, de 0 (ausente) a 10 (intenso). Opcional e salvo por data.</p>
+          <div class="symptom-col"><div id="symptomsBefore"></div></div>
+          <p class="meta-line" data-symptoms-status>Sem registros nesta sessão.</p>
         </div>
       </section>
       <section class="panel feature exercise-group">
@@ -147,27 +138,36 @@
           <div class="list" id="doneList" aria-label="Exercícios concluídos"></div>
         </div>
       </section>
-      <section class="panel feature">
+      <section class="panel feature symptoms-feature">
         <button
           type="button"
           class="section-toggle"
-          id="customToggle"
+          id="symAfterToggle"
           aria-expanded="false"
-          aria-controls="customBody"
+          aria-controls="symAfterBody"
         >
-          Personalizar treino <span class="chevron">⌄</span>
+          <span class="toggle-label">Como você ficou? <span class="toggle-hint">depois do treino</span></span>
+          <span class="chevron">⌄</span>
         </button>
-        <div class="feature-body" id="customBody" hidden>
-          <p class="feature-description">
-            Crie, edite ou remova exercícios deste dia. As mudanças afetam esta sessão e as
-            próximas, preservando registros de outras datas.
-          </p>
-          <button class="config-button primary" type="button" id="addExercisePanel">
-            Adicionar exercício
-          </button>
-          <div class="exercise-options" id="exerciseOptions"></div>
+        <div class="feature-body" id="symAfterBody" hidden>
+          <p class="feature-description">Registre ao terminar, de 0 (ausente) a 10 (intenso). A comparação aparece em Análise dos sintomas.</p>
+          <div class="symptom-col"><div id="symptomsAfter"></div></div>
+          <p class="meta-line" data-symptoms-status>Sem registros nesta sessão.</p>
         </div>
       </section>
+      <div class="actions">
+        <button type="button" class="primary" id="copy">Copiar meu registro</button
+        ><button type="button" id="reset">Reiniciar séries</button>
+      </div>
+      <p class="note">
+        <span id="legNote"
+          >Leg press: somente a resistência da própria máquina. No campo de carga, registre o peso
+          em kg ou escreva “sem anilhas”. </span
+        >Cada data tem seu próprio registro de cargas, repetições, séries e sintomas. Os dados ficam
+        salvos localmente neste navegador; em Configurações você encontra o backup e a sincronização.
+      </p>
+
+      <h2 class="screen-group">Histórico e evolução</h2>
       <section class="panel feature">
         <button
           type="button"
@@ -229,35 +229,6 @@
           <p id="chartCaption" class="chart-data"></p>
         </div>
       </section>
-      <section class="panel feature">
-        <button
-          type="button"
-          class="section-toggle"
-          id="symptomsToggle"
-          aria-expanded="false"
-          aria-controls="symptomsBody"
-        >
-          Diário de sintomas <span class="chevron">⌄</span>
-        </button>
-        <div class="feature-body" id="symptomsBody" hidden>
-          <p class="feature-description">
-            Registre os sintomas antes e depois do treino, de 0 (ausente) a 10 (intenso). Opcional e
-            salvo por data.
-          </p>
-          <div class="symptom-grid">
-            <div class="symptom-col">
-              <strong>Antes do treino</strong>
-              <div id="symptomsBefore"></div>
-            </div>
-            <div class="symptom-col">
-              <strong>Depois do treino</strong>
-              <div id="symptomsAfter"></div>
-            </div>
-          </div>
-          <p class="meta-line" id="symptomsStatus">Sem registros nesta sessão.</p>
-        </div>
-      </section>
-
       <section class="panel feature" id="reportsSection">
         <button
           type="button"
@@ -334,17 +305,6 @@
         </div>
       </section>
 
-      <div class="actions">
-        <button type="button" class="primary" id="copy">Copiar meu registro</button
-        ><button type="button" id="reset">Reiniciar séries</button>
-      </div>
-      <p class="note">
-        <span id="legNote"
-          >Leg press: somente a resistência da própria máquina. No campo de carga, registre o peso
-          em kg ou escreva “sem anilhas”. </span
-        >Cada data tem seu próprio registro de cargas, repetições, séries e sintomas. Os dados ficam
-        salvos localmente neste navegador; em Configurações você encontra o backup e a sincronização.
-      </p>
     </main>
 
     <div class="wrap settings-view" id="settingsView" hidden>
@@ -359,79 +319,51 @@
         <p class="intro">Preferências do aplicativo, dados e sincronização.</p>
       </header>
 
-      <h2 class="settings-group">Aparência</h2>
-      <div class="panel settings-row">
-        <div>
-          <strong>Tema</strong>
-          <div class="small">Alterne entre os modos claro e escuro.</div>
-        </div>
-        <button
-              id="themeToggle"
-              class="theme-button"
-              type="button"
-              aria-label="Alternar modo escuro"
-            >
-              Modo escuro
-            </button>
+      <h2 class="settings-group">Treino</h2>
+      <div class="manage-row day-manage">
+        <span class="small" id="daySummary">Organize sua semana.</span
+        ><button class="manage-btn" id="addDay" type="button">+ Adicionar dia</button>
       </div>
-      <section class="panel feature" id="appearanceSection">
+      <section class="panel feature days-feature">
         <button
           type="button"
           class="section-toggle"
-          id="appearanceToggle"
+          id="daysToggle"
           aria-expanded="false"
-          aria-controls="appearanceBody"
+          aria-controls="daysBody"
         >
-          Aparência e cores <span class="chevron">⌄</span>
+          Gerenciar dias <span class="chevron">⌄</span>
         </button>
-        <div class="feature-body" id="appearanceBody" hidden>
+        <div class="feature-body" id="daysBody" hidden>
           <p class="feature-description">
-            O lavanda e lilás originais permanecem como padrão. Escolha uma paleta pronta ou
-            personalize as cores. O modo escuro acompanha automaticamente a paleta escolhida. As
-            preferências ficam salvas neste navegador.
+            Altere o nome, duplique a programação ou exclua um dia. Os treinos de datas anteriores
+            permanecem no histórico.
           </p>
-          <strong class="small">Paletas sugeridas</strong>
-          <div
-            class="palette-picks"
-            id="palettePicks"
-            role="group"
-            aria-label="Paletas de cores"
-          ></div>
-          <div class="appearance-grid">
-            <label class="color-field" for="colorAccent"
-              >Cor principal<input
-                id="colorAccent"
-                type="color"
-                aria-label="Cor principal" /></label
-            ><label class="color-field" for="colorBackground"
-              >Fundo do app<input
-                id="colorBackground"
-                type="color"
-                aria-label="Cor de fundo" /></label
-            ><label class="color-field" for="colorCard"
-              >Cartões<input id="colorCard" type="color" aria-label="Cor dos cartões" /></label
-            ><label class="color-field" for="colorText"
-              >Texto principal<input id="colorText" type="color" aria-label="Cor do texto"
-            /></label>
-          </div>
-          <div class="appearance-preview" aria-label="Prévia das cores">
-            <div class="appearance-preview-card">Exemplo de cartão</div>
-            <div class="appearance-preview-chip">Concluir</div>
-          </div>
-          <p class="appearance-hint" id="appearanceStatus" aria-live="polite">
-            A paleta padrão está ativa.
-          </p>
-          <div class="appearance-bottom">
-            <button type="button" id="resetColors">Restaurar lavanda original</button>
-          </div>
-          <p class="appearance-hint">
-            As cores principal e de destaque são sincronizadas entre os modos claro e escuro.
-            Alterar o tema não modifica os registros de treino.
-          </p>
+          <div class="day-options" id="dayOptions"></div>
         </div>
       </section>
-
-      <h2 class="settings-group">Treino</h2>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="customToggle"
+          aria-expanded="false"
+          aria-controls="customBody"
+        >
+          Personalizar exercícios <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="customBody" hidden>
+          <p class="feature-description">
+            Crie, edite ou remova exercícios de <strong id="customDayName">um dia</strong>. Para outro
+            dia, escolha-o na tela de treino. As mudanças valem a partir desta sessão, preservando
+            registros de outras datas.
+          </p>
+          <button class="config-button primary" type="button" id="addExercisePanel">
+            Adicionar exercício
+          </button>
+          <div class="exercise-options" id="exerciseOptions"></div>
+        </div>
+      </section>
       <section class="panel feature">
         <button
           type="button"
@@ -558,6 +490,78 @@
             </p>
             <p class="drive-hint" id="driveLastSync">Nenhuma sincronização feita ainda.</p>
           </div>
+        </div>
+      </section>
+
+      <h2 class="settings-group">Aparência</h2>
+      <div class="panel settings-row">
+        <div>
+          <strong>Tema</strong>
+          <div class="small">Alterne entre os modos claro e escuro.</div>
+        </div>
+        <button
+          id="themeToggle"
+          class="theme-button"
+          type="button"
+          aria-label="Alternar modo escuro"
+        >
+          Modo escuro
+        </button>
+      </div>
+      <section class="panel feature" id="appearanceSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="appearanceToggle"
+          aria-expanded="false"
+          aria-controls="appearanceBody"
+        >
+          Aparência e cores <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="appearanceBody" hidden>
+          <p class="feature-description">
+            O lavanda e lilás originais permanecem como padrão. Escolha uma paleta pronta ou
+            personalize as cores. O modo escuro acompanha automaticamente a paleta escolhida. As
+            preferências ficam salvas neste navegador.
+          </p>
+          <strong class="small">Paletas sugeridas</strong>
+          <div
+            class="palette-picks"
+            id="palettePicks"
+            role="group"
+            aria-label="Paletas de cores"
+          ></div>
+          <div class="appearance-grid">
+            <label class="color-field" for="colorAccent"
+              >Cor principal<input
+                id="colorAccent"
+                type="color"
+                aria-label="Cor principal" /></label
+            ><label class="color-field" for="colorBackground"
+              >Fundo do app<input
+                id="colorBackground"
+                type="color"
+                aria-label="Cor de fundo" /></label
+            ><label class="color-field" for="colorCard"
+              >Cartões<input id="colorCard" type="color" aria-label="Cor dos cartões" /></label
+            ><label class="color-field" for="colorText"
+              >Texto principal<input id="colorText" type="color" aria-label="Cor do texto"
+            /></label>
+          </div>
+          <div class="appearance-preview" aria-label="Prévia das cores">
+            <div class="appearance-preview-card">Exemplo de cartão</div>
+            <div class="appearance-preview-chip">Concluir</div>
+          </div>
+          <p class="appearance-hint" id="appearanceStatus" aria-live="polite">
+            A paleta padrão está ativa.
+          </p>
+          <div class="appearance-bottom">
+            <button type="button" id="resetColors">Restaurar lavanda original</button>
+          </div>
+          <p class="appearance-hint">
+            As cores principal e de destaque são sincronizadas entre os modos claro e escuro.
+            Alterar o tema não modifica os registros de treino.
+          </p>
         </div>
       </section>
 
