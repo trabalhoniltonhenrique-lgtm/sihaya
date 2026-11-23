@@ -109,28 +109,44 @@
           ><button type="button" id="pause">Pausar</button>
         </div>
       </section>
-      <div class="sectionhead">
-        <h2>Exercícios</h2>
-        <span class="small" id="exerciseCount">6 exercícios</span>
-      </div>
-      <div class="manage-row">
-        <span class="small">Personalize seu treino sem perder o histórico.</span
-        ><button class="manage-btn" type="button" id="addExercise">+ Novo exercício</button>
-      </div>
-      <div class="filter" role="tablist" aria-label="Categorias de exercícios">
+      <section class="panel feature exercise-group">
         <button
           type="button"
-          class="active"
-          role="tab"
-          aria-selected="true"
-          data-filter="exercises"
+          class="section-toggle"
+          id="pendingToggle"
+          aria-expanded="true"
+          aria-controls="pendingBody"
         >
-          Exercícios</button
-        ><button type="button" role="tab" aria-selected="false" data-filter="done">
-          Concluídos
+          <span class="toggle-label"
+            >Exercícios <span class="toggle-count" id="pendingCount">0</span></span
+          >
+          <span class="chevron">⌄</span>
         </button>
-      </div>
-      <section class="list" id="list" aria-label="Lista de exercícios"></section>
+        <div class="feature-body" id="pendingBody">
+          <div class="manage-row">
+            <span class="small">Personalize seu treino sem perder o histórico.</span
+            ><button class="manage-btn" type="button" id="addExercise">+ Novo exercício</button>
+          </div>
+          <div class="list" id="list" aria-label="Exercícios pendentes"></div>
+        </div>
+      </section>
+      <section class="panel feature exercise-group">
+        <button
+          type="button"
+          class="section-toggle"
+          id="doneToggle"
+          aria-expanded="false"
+          aria-controls="doneBody"
+        >
+          <span class="toggle-label"
+            >Concluídos <span class="toggle-count" id="doneCount">0</span></span
+          >
+          <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="doneBody" hidden>
+          <div class="list" id="doneList" aria-label="Exercícios concluídos"></div>
+        </div>
+      </section>
       <section class="panel feature">
         <button
           type="button"

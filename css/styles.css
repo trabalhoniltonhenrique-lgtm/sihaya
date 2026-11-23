@@ -186,33 +186,6 @@ header {
   letter-spacing: -0.025em;
   margin: 0;
 }
-.filter {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 2px 0 13px;
-  scrollbar-width: none;
-}
-.filter::-webkit-scrollbar {
-  display: none;
-}
-.filter button {
-  white-space: nowrap;
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 100px;
-  background: #fff;
-  color: #645776;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 750;
-  min-height: 42px;
-}
-.filter button.active {
-  background: var(--soft);
-  color: #6638a9;
-  border-color: #d9c3f1;
-}
 .list {
   display: grid;
   grid-template-columns: 1fr;
@@ -460,8 +433,7 @@ html[data-theme='dark'] .switch button.active {
   box-shadow: none;
 }
 html[data-theme='dark'] .timer button,
-html[data-theme='dark'] .actions button,
-html[data-theme='dark'] .filter button {
+html[data-theme='dark'] .actions button {
   background: var(--paper);
   color: var(--purple);
 }
@@ -469,11 +441,6 @@ html[data-theme='dark'] .timer button.primary,
 html[data-theme='dark'] .actions button.primary {
   background: #a57be0;
   color: #20152d;
-}
-html[data-theme='dark'] .filter button.active {
-  background: var(--soft);
-  border-color: #74558e;
-  color: #e8d7ff;
 }
 html[data-theme='dark'] .series {
   background: var(--muted-panel);
@@ -1354,15 +1321,6 @@ html[data-custom-colors='true'] .switch button.active {
   background: var(--paper);
   color: var(--purple);
 }
-html[data-custom-colors='true'] .filter button {
-  color: var(--sub);
-  background: var(--paper);
-}
-html[data-custom-colors='true'] .filter button.active {
-  background: var(--soft);
-  color: var(--purple);
-  border-color: var(--purple2);
-}
 html[data-custom-colors='true'] .timer button,
 html[data-custom-colors='true'] .actions button {
   background: var(--paper);
@@ -1929,4 +1887,28 @@ main[hidden],
 .settings-row strong {
   display: block;
   margin-bottom: 2px;
+}
+
+/* Grupos recolhíveis de exercícios (pendentes e concluídos) */
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.toggle-count {
+  min-width: 26px;
+  padding: 2px 9px;
+  border-radius: 99px;
+  background: var(--soft);
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-align: center;
+}
+.exercise-group .manage-row {
+  margin-top: 0;
+}
+.exercise-group .list .exercise {
+  box-shadow: none;
 }

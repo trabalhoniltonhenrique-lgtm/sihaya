@@ -168,7 +168,6 @@
   let theme = app.theme === 'dark' ? 'dark' : 'light';
   let day = app.activeDays[0],
     sessionDate = dateOfCurrentWeek(day),
-    filter = 'exercises',
     remaining = 60,
     timer = null,
     last = 0,
@@ -486,7 +485,6 @@
     const d = weekdayOf(date);
     day = d;
     sessionDate = date;
-    filter = 'exercises';
     $('sessionDate').value = date;
     renderDays();
     render();
@@ -678,7 +676,6 @@
       sessionDate = iso(monday);
     }
     if (chartDay === d) chartDay = app.activeDays[0];
-    filter = 'exercises';
     save();
     renderDays();
     renderDayOptions();
@@ -773,11 +770,14 @@
 
   function render() {
     const session = current(),
-      list = $('list');
+      list = $('list'),
+      doneList = $('doneList');
     list.replaceChildren();
+    doneList.replaceChildren();
     const total = totalSets(session),
       completed = countDone(session);
-    let visible = 0;
+    let pending = 0,
+      finished = 0;
     $('workoutTitle').textContent = current().workoutName || app.dayTitles[day] || 'Treino';
     $('legNote').hidden = !(day === 'segunda' || day === 'sexta');
     $('sessionDate').value = sessionDate;
@@ -785,9 +785,8 @@
       `Adaptação · ${session.exercises.length} exercícios · ${total} séries`;
     for (const ex of session.exercises) {
       const status = stage(ex);
-      if ((filter === 'exercises' && status === 'done') || (filter === 'done' && status !== 'done'))
-        continue;
-      visible++;
+      if (status === 'done') finished++;
+      else pending++;
       const article = document.createElement('article');
       article.className = 'panel exercise';
       const top = document.createElement('div');
@@ -875,8 +874,7 @@
           const before = stage(ex) === 'done';
           set.done = checkbox.checked;
           commit();
-          if (!before && stage(ex) === 'done' && filter === 'exercises')
-            dissolveCard(article, () => render());
+          if (!before && stage(ex) === 'done') dissolveCard(article, () => render());
           else render();
         });
         lab.append(checkbox, document.createTextNode('Série ' + (n + 1)));
@@ -884,30 +882,39 @@
       });
       bottom.append(setInputs, sets);
       article.append(bottom);
-      list.append(article);
+      (status === 'done' ? doneList : list).append(article);
     }
-    if (!visible) {
+    const empty = (box, text) => {
       const p = document.createElement('div');
       p.className = 'empty';
-      p.textContent =
-        filter === 'done'
-          ? 'Nenhum exercício concluído ainda.'
-          : session.exercises.length
-            ? 'Todos os exercícios foram concluídos.'
-            : 'Adicione seu primeiro exercício para começar.';
-      list.append(p);
-    }
-    $('exerciseCount').textContent = visible + (filter === 'done' ? ' concluídos' : ' pendentes');
+      p.textContent = text;
+      box.append(p);
+    };
+    if (!pending)
+      empty(
+        list,
+        session.exercises.length
+          ? 'Todos os exercícios foram concluídos.'
+          : 'Adicione seu primeiro exercício para começar.',
+      );
+    if (!finished) empty(doneList, 'Nenhum exercício concluído ainda.');
+    $('pendingCount').textContent = pending;
+    $('doneCount').textContent = finished;
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    $('pendingToggle').setAttribute(
+      'aria-label',
+      `Exercícios, ${plural(pending, 'pendente', 'pendentes')}`,
+    );
+    $('doneToggle').setAttribute(
+      'aria-label',
+      `Concluídos, ${plural(finished, 'exercício', 'exercícios')}`,
+    );
     $('progressText').textContent = `${completed} de ${total} séries concluídas`;
     $('progressPct').textContent = (total ? Math.round((completed / total) * 100) : 0) + '%';
     $('fill').style.width = (total ? (completed / total) * 100 : 0) + '%';
     $('progressBar').setAttribute('aria-valuemax', total);
     $('progressBar').setAttribute('aria-valuenow', completed);
     renderDays();
-    document.querySelectorAll('[data-filter]').forEach((b) => {
-      b.classList.toggle('active', b.dataset.filter === filter);
-      b.setAttribute('aria-selected', String(b.dataset.filter === filter));
-    });
   }
   function renderConfig() {
     const box = $('exerciseOptions');
@@ -1269,7 +1276,17 @@
     });
     frame.append(svg);
   }
-  for (const id of ['days', 'appearance', 'custom', 'rest', 'calendar', 'history', 'symptoms']) {
+  for (const id of [
+    'pending',
+    'done',
+    'days',
+    'appearance',
+    'custom',
+    'rest',
+    'calendar',
+    'history',
+    'symptoms',
+  ]) {
     $(id + 'Toggle').addEventListener('click', () => {
       const btn = $(id + 'Toggle'),
         body = $(id + 'Body'),
@@ -1319,13 +1336,6 @@
     calendarMonth = parseDate(v);
     renderCalendar();
   });
-  document.querySelectorAll('[data-filter]').forEach((b) =>
-    b.addEventListener('click', () => {
-      if (transitioning) return;
-      filter = b.dataset.filter;
-      render();
-    }),
-  );
   $('prevMonth').addEventListener('click', () => {
     calendarMonth.setMonth(calendarMonth.getMonth() - 1);
     renderCalendar();
@@ -1348,7 +1358,6 @@
     if (confirm('Desmarcar as séries desta data? Cargas, repetições e sintomas serão mantidos.')) {
       current().exercises.forEach((ex) => ex.sets.forEach((s) => (s.done = false)));
       commit();
-      filter = 'exercises';
       render();
       toast('Séries reiniciadas.');
     }
