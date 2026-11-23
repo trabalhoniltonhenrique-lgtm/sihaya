@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f0fc" />
+    <title>SIHAYA | Seu treino, sua evolução</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body class="sihaya-welcome">
+    <div id="welcome" role="dialog" aria-modal="true" aria-label="Bem-vinda ao SIHAYA">
+      <div class="welcome-shell">
+        <img
+          class="welcome-logo"
+          src="./logo-sihaya.png"
+          alt="Logotipo SIHAYA"
+          width="265"
+          height="265"
+        />
+        <h1>Seu treino, sua evolução.</h1>
+        <p>Treinos, progresso e bem-estar em um só lugar.</p>
+        <div class="welcome-actions">
+          <button type="button" class="enter" id="enterApp">Começar</button
+          ><button type="button" class="continue" id="continueApp">Continuar de onde parei</button>
+        </div>
+        <p class="welcome-note">Seu histórico fica salvo neste aparelho. Nuvem opcional.</p>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <header>
+        <div class="toolbar">
+          <div class="eyebrow">SIHAYA · Meu treino</div>
+          <div class="sihaya-top">
+            <button id="homeButton" class="sihaya-home" type="button">Início</button
+            ><button
+              id="settingsButton"
+              class="theme-button"
+              type="button"
+              aria-controls="settingsView"
+              aria-label="Abrir configurações gerais"
+            >
+              <span aria-hidden="true">⚙</span> Configurações
+            </button>
+                      </div>
+        </div>
+        <h1 id="workoutTitle">Inferiores</h1>
+        <p class="intro" id="workoutIntro">Adaptação · 6 exercícios · 12 séries</p>
+      </header>
+      <nav class="switch" id="daySwitch" aria-label="Dias de treino"></nav>
+      <div class="manage-row day-manage">
+        <span class="small" id="daySummary">Organize sua semana.</span
+        ><button class="manage-btn" id="addDay" type="button">+ Adicionar dia</button>
+      </div>
+      <section class="panel feature days-feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="daysToggle"
+          aria-expanded="false"
+          aria-controls="daysBody"
+        >
+          Gerenciar dias <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="daysBody" hidden>
+          <p class="feature-description">
+            Altere o nome, duplique a programação ou exclua um dia. Os treinos de datas anteriores
+            permanecem no histórico.
+          </p>
+          <div class="day-options" id="dayOptions"></div>
+        </div>
+      </section>
+      <div class="panel sessionbar">
+        <label for="sessionDate">Data da sessão</label
+        ><input class="date-input" type="date" id="sessionDate" aria-label="Data do treino" />
+      </div>
+      <section class="panel summary" aria-label="Progresso">
+        <div class="summary-top">
+          <div>
+            <strong>Progresso do treino</strong>
+            <div class="small" id="progressText">0 de 12 séries concluídas</div>
+          </div>
+          <span class="pct" id="progressPct">0%</span>
+        </div>
+        <div
+          class="track"
+          role="progressbar"
+          aria-label="Progresso das séries"
+          aria-valuemin="0"
+          aria-valuemax="12"
+          aria-valuenow="0"
+          id="progressBar"
+        >
+          <div class="bar" id="fill"></div>
+        </div>
+      </section>
+      <section class="panel timer" aria-label="Cronômetro de descanso">
+        <div>
+          <div class="small">Descanso entre séries</div>
+          <div id="clock" class="clock" role="timer">01:00</div>
+        </div>
+        <div class="timer-actions">
+          <button type="button" id="t60" class="primary">60 s</button
+          ><button type="button" id="t90">90 s</button
+          ><button type="button" id="pause">Pausar</button>
+        </div>
+      </section>
+      <div class="sectionhead">
+        <h2>Exercícios</h2>
+        <span class="small" id="exerciseCount">6 exercícios</span>
+      </div>
+      <div class="manage-row">
+        <span class="small">Personalize seu treino sem perder o histórico.</span
+        ><button class="manage-btn" type="button" id="addExercise">+ Novo exercício</button>
+      </div>
+      <div class="filter" role="tablist" aria-label="Categorias de exercícios">
+        <button
+          type="button"
+          class="active"
+          role="tab"
+          aria-selected="true"
+          data-filter="exercises"
+        >
+          Exercícios</button
+        ><button type="button" role="tab" aria-selected="false" data-filter="done">
+          Concluídos
+        </button>
+      </div>
+      <section class="list" id="list" aria-label="Lista de exercícios"></section>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="customToggle"
+          aria-expanded="false"
+          aria-controls="customBody"
+        >
+          Personalizar treino <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="customBody" hidden>
+          <p class="feature-description">
+            Crie, edite ou remova exercícios deste dia. As mudanças afetam esta sessão e as
+            próximas, preservando registros de outras datas.
+          </p>
+          <button class="config-button primary" type="button" id="addExercisePanel">
+            Adicionar exercício
+          </button>
+          <div class="exercise-options" id="exerciseOptions"></div>
+        </div>
+      </section>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="calendarToggle"
+          aria-expanded="false"
+          aria-controls="calendarBody"
+        >
+          Calendário de treinos <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="calendarBody" hidden>
+          <p class="feature-description">
+            Toque em um dia de treino para abrir seus registros. Lilás forte indica treino
+            concluído.
+          </p>
+          <div class="calendar-head">
+            <button id="prevMonth" type="button" aria-label="Mês anterior">‹</button
+            ><strong id="monthTitle"></strong
+            ><button id="nextMonth" type="button" aria-label="Próximo mês">›</button>
+          </div>
+          <div class="weekdays">
+            <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span
+            ><span>Sáb</span><span>Dom</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="legend">
+            <span><span class="dot"></span>Programado</span
+            ><span><span class="dot part"></span>Iniciado</span
+            ><span><span class="dot done"></span>Concluído</span>
+          </div>
+        </div>
+      </section>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="historyToggle"
+          aria-expanded="false"
+          aria-controls="historyBody"
+        >
+          Evolução de cargas <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="historyBody" hidden>
+          <p class="feature-description">
+            Compare as cargas anotadas em cada sessão. Gráfico em kg, pela maior carga registrada
+            entre as duas séries.
+          </p>
+          <div class="chart-settings">
+            <div>
+              <label for="chartDay">Treino</label
+              ><select id="chartDay"></select>
+            </div>
+            <div>
+              <label for="chartExercise">Exercício</label
+              ><select id="chartExercise"></select>
+            </div>
+          </div>
+          <div class="chart-frame" id="chartFrame"></div>
+          <p id="chartCaption" class="chart-data"></p>
+        </div>
+      </section>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="symptomsToggle"
+          aria-expanded="false"
+          aria-controls="symptomsBody"
+        >
+          Diário de sintomas <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="symptomsBody" hidden>
+          <p class="feature-description">
+            Registre os sintomas antes e depois do treino, de 0 (ausente) a 10 (intenso). Opcional e
+            salvo por data.
+          </p>
+          <div class="symptom-grid">
+            <div class="symptom-col">
+              <strong>Antes do treino</strong>
+              <div id="symptomsBefore"></div>
+            </div>
+            <div class="symptom-col">
+              <strong>Depois do treino</strong>
+              <div id="symptomsAfter"></div>
+            </div>
+          </div>
+          <p class="meta-line" id="symptomsStatus">Sem registros nesta sessão.</p>
+        </div>
+      </section>
+
+      <section class="panel feature" id="reportsSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="reportsToggle"
+          aria-expanded="false"
+          aria-controls="reportsBody"
+        >
+          Relatório mensal <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="reportsBody" hidden>
+          <p class="feature-description">
+            Resumo de sessões com atividades registradas. Sessões sem registros não contam como
+            realizadas.
+          </p>
+          <div class="report-top">
+            <label>Mês analisado<input type="month" id="reportMonth" /></label
+            ><button type="button" class="config-button" id="reportCsv">
+              Exportar relatório CSV
+            </button>
+          </div>
+          <div class="stats-grid" id="reportStats"></div>
+          <h3 class="report-subtitle">Treinos por semana</h3>
+          <div class="report-plot" id="reportPlot"></div>
+          <h3 class="report-subtitle">Por tipo de treino</h3>
+          <div class="month-list" id="reportDays"></div>
+          <p class="analysis-note" id="reportFoot"></p>
+        </div>
+      </section>
+      <section class="panel feature" id="comparisonSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="comparisonToggle"
+          aria-expanded="false"
+          aria-controls="comparisonBody"
+        >
+          Comparar desempenho <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="comparisonBody" hidden>
+          <p class="feature-description">
+            Compare sessões e séries executadas em dois meses, sem misturar exercícios ou cargas
+            diferentes.
+          </p>
+          <div class="compare-controls">
+            <label>Mês inicial<select id="compareFrom"></select></label
+            ><label>Mês final<select id="compareTo"></select></label>
+          </div>
+          <div class="compare-grid" id="compareResults"></div>
+          <p class="analysis-note">
+            Cargas entre exercícios diferentes não são somadas: os valores do treino dependem do
+            equipamento e da execução. Para evolução por exercício, use "Evolução de cargas".
+          </p>
+        </div>
+      </section>
+      <section class="panel feature" id="analysisSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="analysisToggle"
+          aria-expanded="false"
+          aria-controls="analysisBody"
+        >
+          Análise dos sintomas <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="analysisBody" hidden>
+          <p class="feature-description">
+            Médias de sintomas registrados antes e depois do treino para o mês selecionado no
+            relatório. São observações pessoais, não uma avaliação clínica.
+          </p>
+          <div class="symptom-analysis-grid" id="symptomAnalytics"></div>
+          <div class="report-plot" id="symptomPlot" style="margin-top: 10px"></div>
+          <p class="analysis-note" id="symptomFoot"></p>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="button" class="primary" id="copy">Copiar meu registro</button
+        ><button type="button" id="reset">Reiniciar séries</button>
+      </div>
+      <p class="note">
+        <span id="legNote"
+          >Leg press: somente a resistência da própria máquina. No campo de carga, registre o peso
+          em kg ou escreva “sem anilhas”. </span
+        >Cada data tem seu próprio registro de cargas, repetições, séries e sintomas. Os dados ficam
+        salvos localmente neste navegador; em Configurações você encontra o backup e a sincronização.
+      </p>
+    </main>
+
+    <div class="wrap settings-view" id="settingsView" hidden>
+      <header>
+        <div class="toolbar">
+          <div class="eyebrow">SIHAYA · Configurações</div>
+          <button id="settingsBack" class="theme-button" type="button">
+            <span aria-hidden="true">←</span> Voltar ao treino
+          </button>
+        </div>
+        <h1 id="settingsTitle" tabindex="-1">Configurações gerais</h1>
+        <p class="intro">Preferências do aplicativo, dados e sincronização.</p>
+      </header>
+
+      <h2 class="settings-group">Aparência</h2>
+      <div class="panel settings-row">
+        <div>
+          <strong>Tema</strong>
+          <div class="small">Alterne entre os modos claro e escuro.</div>
+        </div>
+        <button
+              id="themeToggle"
+              class="theme-button"
+              type="button"
+              aria-label="Alternar modo escuro"
+            >
+              Modo escuro
+            </button>
+      </div>
+      <section class="panel feature" id="appearanceSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="appearanceToggle"
+          aria-expanded="false"
+          aria-controls="appearanceBody"
+        >
+          Aparência e cores <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="appearanceBody" hidden>
+          <p class="feature-description">
+            O lavanda e lilás originais permanecem como padrão. Escolha uma paleta pronta ou
+            personalize as cores. O modo escuro acompanha automaticamente a paleta escolhida. As
+            preferências ficam salvas neste navegador.
+          </p>
+          <strong class="small">Paletas sugeridas</strong>
+          <div
+            class="palette-picks"
+            id="palettePicks"
+            role="group"
+            aria-label="Paletas de cores"
+          ></div>
+          <div class="appearance-grid">
+            <label class="color-field" for="colorAccent"
+              >Cor principal<input
+                id="colorAccent"
+                type="color"
+                aria-label="Cor principal" /></label
+            ><label class="color-field" for="colorBackground"
+              >Fundo do app<input
+                id="colorBackground"
+                type="color"
+                aria-label="Cor de fundo" /></label
+            ><label class="color-field" for="colorCard"
+              >Cartões<input id="colorCard" type="color" aria-label="Cor dos cartões" /></label
+            ><label class="color-field" for="colorText"
+              >Texto principal<input id="colorText" type="color" aria-label="Cor do texto"
+            /></label>
+          </div>
+          <div class="appearance-preview" aria-label="Prévia das cores">
+            <div class="appearance-preview-card">Exemplo de cartão</div>
+            <div class="appearance-preview-chip">Concluir</div>
+          </div>
+          <p class="appearance-hint" id="appearanceStatus" aria-live="polite">
+            A paleta padrão está ativa.
+          </p>
+          <div class="appearance-bottom">
+            <button type="button" id="resetColors">Restaurar lavanda original</button>
+          </div>
+          <p class="appearance-hint">
+            As cores principal e de destaque são sincronizadas entre os modos claro e escuro.
+            Alterar o tema não modifica os registros de treino.
+          </p>
+        </div>
+      </section>
+
+      <h2 class="settings-group">Treino</h2>
+      <section class="panel feature">
+        <button
+          type="button"
+          class="section-toggle"
+          id="restToggle"
+          aria-expanded="false"
+          aria-controls="restBody"
+        >
+          Descanso entre séries <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="restBody" hidden>
+          <p class="feature-description">
+            Tempos dos botões de descanso rápido do cronômetro, usados em todos os dias de treino.
+          </p>
+          <div class="rest-config">
+            <label class="setting-field"
+              >Descanso rápido 1 (segundos)<input
+                type="number"
+                inputmode="numeric"
+                min="15"
+                max="600"
+                step="5"
+                id="restOne" /></label
+            ><label class="setting-field"
+              >Descanso rápido 2 (segundos)<input
+                type="number"
+                inputmode="numeric"
+                min="15"
+                max="600"
+                step="5"
+                id="restTwo"
+            /></label>
+          </div>
+          <p class="config-help">
+            Cada exercício também pode ter seu próprio intervalo. Ao tocar no intervalo do cartão, o
+            cronômetro começa com esse tempo.
+          </p>
+        </div>
+      </section>
+
+      <h2 class="settings-group">Dados e sincronização</h2>
+      <section class="panel feature" id="backupSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="backupToggle"
+          aria-expanded="false"
+          aria-controls="backupBody"
+        >
+          Backup e nuvem <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="backupBody" hidden>
+          <p class="feature-description">
+            Proteja o histórico exportando todos os dados. Você pode guardar o arquivo no Google
+            Drive, iCloud ou outro serviço e restaurar em outro aparelho.
+          </p>
+          <div class="backup-actions">
+            <button class="primary" id="exportBackup" type="button">Baixar backup JSON</button
+            ><label for="importBackup"
+              >Restaurar backup<input
+                id="importBackup"
+                type="file"
+                accept="application/json,.json" /></label
+            ><button id="exportSessionsCsv" type="button">Exportar sessões CSV</button>
+          </div>
+          <p class="data-note" id="backupStatus">
+            Backup manual: não envia informações a servidores. O Google Drive está disponível na
+            seção abaixo; a sincronização automática pode ser configurada para ocorrer uma vez por
+            semana.
+          </p>
+          <p class="data-note">
+            Seus registros de sintomas são dados sensíveis. Guarde o backup em uma conta protegida e
+            não compartilhe o arquivo publicamente.
+          </p>
+        </div>
+      </section>
+      <section class="panel feature" id="driveSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="driveToggle"
+          aria-expanded="false"
+          aria-controls="driveBody"
+        >
+          Google Drive · Sincronização <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="driveBody" hidden>
+          <p class="feature-description">
+            Conecte sua conta Google para guardar uma cópia privada dos treinos na pasta de dados do
+            aplicativo. É necessário publicar o app em HTTPS e informar seu ID de cliente OAuth.
+          </p>
+          <div id="driveStatus" class="drive-status" role="status" aria-live="polite">
+            Não conectado. Os dados continuam salvos no dispositivo.
+          </div>
+          <div class="drive-settings">
+            <label for="googleClientId"
+              >ID de cliente OAuth 2.0 (tipo: Aplicativo da Web)<input
+                id="googleClientId"
+                type="text"
+                autocapitalize="off"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="0000000000-xxxx.apps.googleusercontent.com"
+            /></label>
+            <div class="drive-actions">
+              <button id="driveConnect" type="button" class="primary">Conectar Google</button
+              ><button id="driveDisconnect" type="button" disabled>Desconectar</button
+              ><button id="driveUpload" type="button" disabled>Enviar backup</button
+              ><button id="driveDownload" type="button" disabled>Restaurar do Drive</button>
+            </div>
+            <label class="drive-autosync"
+              ><input id="driveAuto" type="checkbox" />Sincronização automática semanal (a cada 7
+              dias, com o app aberto e conectado)</label
+            >
+            <p class="drive-warning">
+              O Drive mantém uma cópia completa dos dados. Para não apagar alterações feitas em
+              outro aparelho, o app bloqueia o envio se encontrar um backup remoto mais recente.
+              Restaurar substitui os registros locais somente após sua confirmação.
+            </p>
+            <p class="drive-hint">
+              O acesso é limitado à pasta oculta <code>appDataFolder</code> do SIHAYA. Nenhum token
+              é gravado no dispositivo. O login precisa ser renovado quando expirar; a sincronização
+              semanal não funciona com a página fechada ou sem autorização válida.
+            </p>
+            <p class="drive-hint" id="driveLastSync">Nenhuma sincronização feita ainda.</p>
+          </div>
+        </div>
+      </section>
+
+      <p class="note">As configurações ficam salvas neste aparelho.</p>
+    </div>
+    <dialog class="edit-dialog" id="exerciseDialog" aria-labelledby="editHeading">
+      <form id="exerciseForm">
+        <h2 id="editHeading">Editar exercício</h2>
+        <p>
+          As alterações feitas aqui serão aplicadas à sessão selecionada e aos próximos treinos.
+        </p>
+        <div class="form-grid">
+          <label class="wide"
+            >Nome do exercício<input
+              id="editName"
+              maxlength="90"
+              required
+              autocomplete="off"
+              placeholder="Nome do exercício" /></label
+          ><label
+            >Quantidade de séries<input
+              id="editSets"
+              type="number"
+              inputmode="numeric"
+              min="1"
+              max="12"
+              step="1"
+              required /></label
+          ><label
+            >Repetições previstas<input
+              id="editReps"
+              maxlength="30"
+              required
+              placeholder="Ex.: 12–15" /></label
+          ><label class="wide"
+            >Intervalo após a série (segundos)<input
+              id="editRest"
+              type="number"
+              inputmode="numeric"
+              min="15"
+              max="600"
+              step="5"
+              required
+          /></label>
+        </div>
+        <div class="dialog-buttons">
+          <button type="button" id="deleteExercise" class="danger">Excluir</button
+          ><button type="button" id="cancelExercise">Cancelar</button
+          ><button type="submit" class="primary">Salvar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="edit-dialog" id="dayDialog" aria-labelledby="dayHeading">
+      <form id="dayForm">
+        <h2 id="dayHeading">Novo dia de treino</h2>
+        <p id="dayDialogHint">Adicione um dia e escolha quais exercícios utilizar.</p>
+        <div class="form-grid">
+          <label class="wide" id="weekdayField"
+            >Dia da semana<select id="dayWeekday" required></select></label
+          ><label class="wide"
+            >Nome do treino<input
+              id="dayTitle"
+              maxlength="48"
+              required
+              placeholder="Ex.: Glúteos, Cardio, Superiores" /></label
+          ><label class="wide" id="copyField"
+            >Exercícios iniciais<select id="dayCopy"></select
+          ></label>
+        </div>
+        <div class="dialog-buttons">
+          <button type="button" id="cancelDay">Cancelar</button
+          ><button type="submit" class="primary">Salvar dia</button>
+        </div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./js/app.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="./js/drive-sync.js"></script>
+  </body>
+</html>

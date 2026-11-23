@@ -1,0 +1,14 @@
+# Dados pessoais: nunca enviar backups ou exportações ao repositório
+backup-*.json
+sihaya-backup*.json
+*.csv
+
+# Configurações locais do Claude Code
+.claude/settings.local.json
+
+# Sistema e editores
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+node_modules/

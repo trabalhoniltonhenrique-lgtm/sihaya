@@ -1,0 +1,109 @@
+SIHAYA — Versão 2.1 (PWA + Google Drive)
+========================================
+
+O QUE ESTÁ PRONTO
+- Tela inicial interativa com a logo SIHAYA.
+- Todos os recursos da versão 2.0: dias, exercícios, cargas, sintomas,
+  relatórios mensais, calendário, temas personalizáveis e efeito de pó.
+- PWA: manifesto, ícones e cache offline.
+- Conexão OAuth 2.0 opcional ao Google Drive, usando permissão drive.appdata.
+- Envio manual, restauração com confirmação e backup automático opcional
+  após alterações, enquanto o aplicativo está aberto e conectado.
+- Proteção básica contra sobrescrever backup remoto alterado em outro aparelho.
+- Backup JSON e CSV locais continuam disponíveis.
+
+CUSTOS
+O código pode ser hospedado gratuitamente em GitHub Pages para uso
+pessoal. Google Drive API e OAuth possuem cotas/condições próprias.
+A conta Google tem uma cota de armazenamento, geralmente 15 GB nas
+contas pessoais gratuitas compartilhada entre serviços. Não há
+mensalidade prevista para o uso pessoal normal, mas consulte sempre
+as condições atuais do Google e do serviço de hospedagem.
+
+1. PUBLICAR O APP GRATUITAMENTE
+- Crie uma conta GitHub, se não tiver.
+- Crie um repositório PÚBLICO para o código (exemplo: sihaya-app).
+- Envie os arquivos do projeto para a raiz do repositório, mantendo
+  as pastas: index.html, sw.js, manifest.webmanifest, imagens,
+  css/styles.css, js/app.js e js/drive-sync.js.
+
+ESTRUTURA DO CÓDIGO
+- index.html ........ estrutura da página (HTML): tela de treino e
+                      tela "Configurações gerais" (botão ⚙ no topo)
+- css/styles.css .... aparência, temas e layout
+- js/app.js ......... lógica do app: treinos, relatórios, backup,
+                      tela de boas-vindas e registro do service worker
+- js/drive-sync.js .. login Google e sincronização com o Drive
+- sw.js ............. cache offline. Ao publicar mudanças, troque o
+                      nome em CACHE (ex.: sihaya-app-v2-3).
+- Em Settings > Pages, escolha Deploy from a branch, branch main, /(root).
+- Abra o endereço HTTPS publicado:
+  https://SEU-USUARIO.github.io/sihaya-app/
+- NÃO envie backups JSON ou CSV nem registros pessoais ao repositório.
+
+2. CONFIGURAR GOOGLE CLOUD GRATUITAMENTE
+- Acesse https://console.cloud.google.com/.
+- Crie um projeto e ative Google Drive API em APIs e serviços.
+- Configure a tela de consentimento OAuth. Para uso pessoal, mantenha
+  o app em Testing e adicione seu próprio e-mail à lista de usuários
+  de teste, quando a tela solicitar.
+- Crie uma credencial OAuth 2.0 do tipo APLICATIVO DA WEB.
+- Em Origens JavaScript autorizadas, adicione a ORIGEM HTTPS, sem
+  caminho, por exemplo: https://SEU-USUARIO.github.io
+  (NÃO cole /sihaya-app/ nessa lista.)
+- Copie o ID de cliente: termina em .apps.googleusercontent.com
+  Nunca é necessário criar ou colocar uma client secret no app.
+- No SIHAYA, abra Google Drive · Sincronização, cole o ID e toque
+  em Conectar Google. Aceite a permissão solicitada.
+- Primeiro, toque em Enviar backup para criar a cópia na pasta oculta
+  appDataFolder do SIHAYA. A sincronização automática semanal vem ativada, mas só envia quando você conectar a conta. Pode desativá-la no painel Google Drive.
+
+3. INSTALAR NO CELULAR
+- Android: abra o endereço HTTPS no Chrome e procure
+  'Instalar aplicativo' ou 'Adicionar à tela inicial'.
+- iPhone: abra no Safari, toque em Compartilhar > Adicionar à Tela de Início.
+- A instalação depende do navegador e do sistema operacional.
+
+IMPORTANTÍSSIMO SOBRE DADOS E SEGURANÇA
+- O Google Drive é OPCIONAL. Sem login, os treinos locais funcionam offline.
+- O login precisa de internet; a autenticação não funciona abrindo
+  index.html pelo gerenciador de arquivos (file://).
+- O SIHAYA usa uma área oculta chamada appDataFolder do Google Drive.
+  Não solicita acesso a todos os seus arquivos.
+- O app não salva o token de acesso Google no disco; você precisará
+  reconectar quando a autorização expirar.
+- 'Sincronização semanal' só executa uma vez a cada 7 dias, com esta página aberta, conectada e
+  internet disponível; não é sincronização em segundo plano.
+- O Drive guarda um BACKUP completo, não uma fusão de treinos de
+  diferentes aparelhos. Para trocar de aparelho, restaure o backup
+  do Drive antes de fazer alterações no novo dispositivo.
+- Se o Drive tiver um backup remoto modificado desde a última
+  cópia reconhecida, novos envios serão bloqueados, para evitar perda.
+- A restauração substitui os registros locais SOMENTE com confirmação.
+- Os dados de sintomas são dados pessoais de saúde. O app não
+  implementa criptografia de ponta a ponta. Trate seu Google Drive,
+  conta e arquivos de backup com cuidado e use autenticação de 2 fatores.
+- Faça backups JSON periódicos em local seguro.
+
+TESTES / LIMITAÇÕES
+- Foi verificada a sintaxe JavaScript e a interface em navegador
+  automatizado com conteúdo local simulado.
+- Não foi possível completar uma autorização REAL do Google neste
+  ambiente porque falta seu próprio OAuth Client ID e domínio HTTPS.
+- Ainda é preciso testar no endereço publicado os fluxos Google:
+  conectar, enviar, restaurar e lidar com a perda de conexão.
+- Dados antigos só aparecem automaticamente se o navegador compartilhar
+  o mesmo armazenamento; use backup JSON na migração entre endereços.
+
+DOCUMENTAÇÃO OFICIAL
+https://developers.google.com/workspace/drive/api/guides/appdata
+https://developers.google.com/identity/oauth2/web/guides/use-token-model
+https://developers.google.com/identity/oauth2/web/guides/get-google-api-clientid
+https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
+
+AGENDAMENTO SEMANAL
+- A sincronização automática acontece no máximo uma vez a cada 7 dias após o último envio bem-sucedido.
+- O primeiro envio automático pode ocorrer 15 segundos depois da conexão se ainda não houver registro de envio.
+- Se o app estiver fechado, sem internet ou sem autorização, o envio ficará pendente até a próxima abertura e conexão.
+- O botão Enviar backup continua disponível a qualquer momento e reinicia a contagem de 7 dias.
+- Não há sincronização de verdade em segundo plano.
