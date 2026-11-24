@@ -1987,6 +1987,7 @@
   const main = document.querySelector('main');
   const settings = document.getElementById('settingsView');
   const settingsButton = document.getElementById('settingsButton');
+  document.getElementById('appVersion').textContent = self.SIHAYA_VERSION || '—';
   function showSettings(open) {
     main.hidden = open;
     settings.hidden = !open;

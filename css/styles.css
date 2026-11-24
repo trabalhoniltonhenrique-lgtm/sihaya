@@ -487,20 +487,6 @@ html[data-theme='dark'] .empty {
   min-height: 42px;
   white-space: nowrap;
 }
-.sessionbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 15px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-.sessionbar label {
-  font-size: 13px;
-  font-weight: 750;
-}
-.date-input,
 select {
   font: inherit;
   background: var(--field);
@@ -1733,16 +1719,6 @@ body.sihaya-welcome {
   font-size: 12px !important;
   margin-top: 8px;
 }
-.sihaya-home {
-  border: 1px solid var(--line);
-  color: var(--purple);
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 8px 11px;
-  font-size: 12px;
-  font-weight: 750;
-  min-height: 39px;
-}
 .sihaya-top {
   display: flex;
   align-items: center;
@@ -1851,9 +1827,6 @@ body.sihaya-welcome {
 main[hidden],
 .settings-view[hidden] {
   display: none !important;
-}
-.sihaya-top #settingsButton {
-  min-width: 0;
 }
 .settings-view h1:focus {
   outline: none;
@@ -2008,4 +1981,82 @@ html {
   margin-top: 7px;
   font-size: 12px;
   color: var(--sub);
+}
+
+/* Versão do app no rodapé das Configurações */
+.app-version {
+  margin: 18px 3px 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Barra superior: Início, data da sessão e Configurações no mesmo formato */
+.toolbar {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+.sihaya-top {
+  margin-left: auto;
+  flex-wrap: nowrap;
+  gap: 7px;
+}
+.top-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-sizing: border-box;
+  min-height: 40px;
+  min-width: 40px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--paper);
+  color: var(--purple);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.date-pill {
+  padding-block: 0;
+}
+.date-pill input {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  margin: 0;
+  min-height: 38px;
+  min-width: 0;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.date-pill:focus-within {
+  outline: 3px solid #b996ec;
+  outline-offset: 2px;
+}
+.date-pill input:focus-visible {
+  outline: none;
+}
+html[data-theme='dark'] .date-pill input {
+  color-scheme: dark;
+}
+/* Celular: Configurações vira só o ícone ⚙ para caber tudo em uma linha */
+@media (max-width: 480px) {
+  .top-pill {
+    font-size: 12px;
+    padding-inline: 11px;
+  }
+  .top-pill-text {
+    display: none;
+  }
+  .sihaya-top {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

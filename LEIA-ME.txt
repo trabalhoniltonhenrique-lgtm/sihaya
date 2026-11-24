@@ -25,7 +25,7 @@ as condições atuais do Google e do serviço de hospedagem.
 - Crie um repositório PÚBLICO para o código (exemplo: sihaya-app).
 - Envie os arquivos do projeto para a raiz do repositório, mantendo
   as pastas: index.html, sw.js, manifest.webmanifest, imagens,
-  css/styles.css, js/app.js e js/drive-sync.js.
+  css/styles.css e a pasta js/ (version.js, app.js, drive-sync.js).
 
 ESTRUTURA DO CÓDIGO
 - index.html ........ estrutura da página (HTML): tela de treino e
@@ -34,8 +34,10 @@ ESTRUTURA DO CÓDIGO
 - js/app.js ......... lógica do app: treinos, relatórios, backup,
                       tela de boas-vindas e registro do service worker
 - js/drive-sync.js .. login Google e sincronização com o Drive
-- sw.js ............. cache offline. Ao publicar mudanças, troque o
-                      nome em CACHE (ex.: sihaya-app-v2-3).
+- js/version.js ..... número da versão (aparece em Configurações).
+                      AO PUBLICAR MUDANÇAS, AUMENTE ESTE NÚMERO: ele
+                      renova o cache e faz os celulares atualizarem.
+- sw.js ............. cache offline (usa a versão de js/version.js)
 - Em Settings > Pages, escolha Deploy from a branch, branch main, /(root).
 - Abra o endereço HTTPS publicado:
   https://SEU-USUARIO.github.io/sihaya-app/

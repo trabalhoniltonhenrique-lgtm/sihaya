@@ -1,9 +1,12 @@
-// Troque o nome do cache ao publicar uma nova versão para limpar caches antigos.
-const CACHE = 'sihaya-app-v2-6';
+// A versão vem de js/version.js. Quando ela muda, o navegador detecta o
+// service worker novo e o cache antigo é apagado na ativação.
+importScripts('./js/version.js');
+const CACHE = 'sihaya-app-v' + self.SIHAYA_VERSION;
 const FILES = [
   './',
   './index.html',
   './css/styles.css',
+  './js/version.js',
   './js/app.js',
   './js/drive-sync.js',
   './manifest.webmanifest',

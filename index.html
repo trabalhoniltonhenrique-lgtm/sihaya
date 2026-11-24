@@ -36,26 +36,24 @@
         <div class="toolbar">
           <div class="eyebrow">SIHAYA · Meu treino</div>
           <div class="sihaya-top">
-            <button id="homeButton" class="sihaya-home" type="button">Início</button
+            <button id="homeButton" class="top-pill" type="button">Início</button
+            ><label class="top-pill date-pill" title="Data da sessão"
+              ><input type="date" id="sessionDate" aria-label="Data da sessão" /></label
             ><button
               id="settingsButton"
-              class="theme-button"
+              class="top-pill"
               type="button"
               aria-controls="settingsView"
               aria-label="Abrir configurações gerais"
             >
-              <span aria-hidden="true">⚙</span> Configurações
+              <span aria-hidden="true">⚙</span><span class="top-pill-text"> Configurações</span>
             </button>
-                      </div>
+          </div>
         </div>
         <h1 id="workoutTitle">Inferiores</h1>
         <p class="intro" id="workoutIntro">Adaptação · 6 exercícios · 12 séries</p>
       </header>
       <nav class="switch" id="daySwitch" aria-label="Dias de treino"></nav>
-      <div class="panel sessionbar">
-        <label for="sessionDate">Data da sessão</label
-        ><input class="date-input" type="date" id="sessionDate" aria-label="Data do treino" />
-      </div>
       <section class="panel workout-bar" aria-label="Progresso e descanso">
         <div class="wb-row">
           <div class="wb-progress">
@@ -562,6 +560,7 @@
       </section>
 
       <p class="note">As configurações ficam salvas neste aparelho.</p>
+      <p class="app-version">SIHAYA · versão <span id="appVersion">—</span></p>
     </div>
     <dialog class="edit-dialog" id="exerciseDialog" aria-labelledby="editHeading">
       <form id="exerciseForm">
@@ -634,6 +633,7 @@
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./js/version.js"></script>
     <script src="./js/app.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="./js/drive-sync.js"></script>
