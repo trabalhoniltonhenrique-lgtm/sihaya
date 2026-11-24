@@ -1971,13 +1971,41 @@ main[hidden],
   letter-spacing: 0;
   color: var(--sub);
 }
-.symptoms-feature .symptom-col {
-  margin-top: 4px;
-}
 .actions + .note {
   margin-bottom: 4px;
 }
 /* Rolagens automáticas não param escondidas sob a barra fixa */
 html {
   scroll-padding-top: 140px;
+}
+
+/* Feedback pós-treino */
+.feedback-feature label.feature-description {
+  display: block;
+}
+.feedback-text {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 104px;
+  resize: vertical;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 11px 12px;
+}
+.feedback-text:focus-visible {
+  outline: 3px solid #b996ec;
+  outline-offset: 2px;
+}
+.feedback-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--sub);
 }

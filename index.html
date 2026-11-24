@@ -83,23 +83,6 @@
           <div class="bar" id="fill"></div>
         </div>
       </section>
-      <section class="panel feature symptoms-feature">
-        <button
-          type="button"
-          class="section-toggle"
-          id="symBeforeToggle"
-          aria-expanded="false"
-          aria-controls="symBeforeBody"
-        >
-          <span class="toggle-label">Como você está? <span class="toggle-hint">antes do treino</span></span>
-          <span class="chevron">⌄</span>
-        </button>
-        <div class="feature-body" id="symBeforeBody" hidden>
-          <p class="feature-description">Registre antes de começar, de 0 (ausente) a 10 (intenso). Opcional e salvo por data.</p>
-          <div class="symptom-col"><div id="symptomsBefore"></div></div>
-          <p class="meta-line" data-symptoms-status>Sem registros nesta sessão.</p>
-        </div>
-      </section>
       <section class="panel feature exercise-group">
         <button
           type="button"
@@ -138,21 +121,34 @@
           <div class="list" id="doneList" aria-label="Exercícios concluídos"></div>
         </div>
       </section>
-      <section class="panel feature symptoms-feature">
+      <section class="panel feature feedback-feature" id="feedbackSection" hidden>
         <button
           type="button"
           class="section-toggle"
-          id="symAfterToggle"
-          aria-expanded="false"
-          aria-controls="symAfterBody"
+          id="feedbackToggle"
+          aria-expanded="true"
+          aria-controls="feedbackBody"
         >
-          <span class="toggle-label">Como você ficou? <span class="toggle-hint">depois do treino</span></span>
+          <span class="toggle-label"
+            >Feedback do treino <span class="toggle-hint" id="feedbackHint">opcional</span></span
+          >
           <span class="chevron">⌄</span>
         </button>
-        <div class="feature-body" id="symAfterBody" hidden>
-          <p class="feature-description">Registre ao terminar, de 0 (ausente) a 10 (intenso). A comparação aparece em Análise dos sintomas.</p>
-          <div class="symptom-col"><div id="symptomsAfter"></div></div>
-          <p class="meta-line" data-symptoms-status>Sem registros nesta sessão.</p>
+        <div class="feature-body" id="feedbackBody">
+          <label class="feature-description" for="feedbackText"
+            >Como foi o treino? Anote sensações, dificuldades ou ajustes para a próxima vez.</label
+          >
+          <textarea
+            id="feedbackText"
+            class="feedback-text"
+            rows="4"
+            maxlength="1000"
+            placeholder="Ex.: leg press mais firme hoje; cansaço no fim; aumentar a carga da cadeira extensora."
+          ></textarea>
+          <div class="feedback-meta">
+            <span id="feedbackStatus" aria-live="polite">Salvo automaticamente.</span>
+            <span id="feedbackCount">0/1000</span>
+          </div>
         </div>
       </section>
       <div class="actions">

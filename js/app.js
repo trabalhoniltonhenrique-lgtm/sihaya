@@ -3,6 +3,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id),
     pad = (n) => String(n).padStart(2, '0');
+  const FEEDBACK_MAX = 1000;
   const iso = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   const parseDate = (s) => {
     const [y, m, d] = s.split('-').map(Number);
@@ -98,10 +99,12 @@
           sets: Array.from({ length: a.count }, (_, j) => a.sets[j] || emptySet()),
         };
       }),
+      // Sintomas: mantidos apenas como histórico de registros antigos.
       symptoms: {
         before: { ...(raw?.symptoms?.before || {}) },
         after: { ...(raw?.symptoms?.after || {}) },
       },
+      feedback: String(raw?.feedback || '').slice(0, FEEDBACK_MAX),
     };
   };
   let app = {
@@ -204,6 +207,7 @@
         workoutName: app.dayTitles[day],
         exercises: (app.templates[day] || []).map(fromConfig),
         symptoms: { before: {}, after: {} },
+        feedback: '',
       };
     return app.sessions[sessionDate];
   }
@@ -222,9 +226,19 @@
       x?.exercises?.some((ex) =>
         ex?.sets?.some((s) => s.done || s.load?.trim() || s.reps?.trim()),
       ) ||
+      hasSymptoms(x) ||
+      !!String(x?.feedback || '').trim()
+    );
+  }
+  function hasSymptoms(x) {
+    return (
       Object.values(x?.symptoms?.before || {}).some((v) => v !== '') ||
       Object.values(x?.symptoms?.after || {}).some((v) => v !== '')
     );
+  }
+  function sessionComplete(s) {
+    const total = totalSets(s);
+    return total > 0 && countDone(s) === total;
   }
   function commit() {
     save();
@@ -488,7 +502,6 @@
     $('sessionDate').value = date;
     renderDays();
     render();
-    renderSymptoms();
     renderCalendar();
     renderConfig();
     renderChart();
@@ -680,7 +693,6 @@
     renderDays();
     renderDayOptions();
     render();
-    renderSymptoms();
     renderCalendar();
     renderConfig();
     renderChart();
@@ -915,6 +927,7 @@
     $('progressBar').setAttribute('aria-valuemax', total);
     $('progressBar').setAttribute('aria-valuenow', completed);
     renderDays();
+    renderFeedback();
   }
   function renderConfig() {
     const box = $('exerciseOptions');
@@ -1072,63 +1085,31 @@
       grid.append(btn);
     }
   }
-  function renderSymptoms() {
-    const sym = current().symptoms;
-    for (const [period, target] of [
-      ['before', 'symptomsBefore'],
-      ['after', 'symptomsAfter'],
-    ]) {
-      const box = $(target);
-      box.replaceChildren();
-      if (!sym[period]) sym[period] = {};
-      for (const [key, name] of metrics) {
-        const row = document.createElement('div');
-        row.className = 'symptom-row';
-        const lbl = document.createElement('label'),
-          sel = document.createElement('select');
-        const id = 'symptom-' + period + '-' + key;
-        sel.id = id;
-        lbl.htmlFor = id;
-        const text = document.createElement('span');
-        text.textContent = name;
-        const v = document.createElement('b');
-        v.textContent =
-          sym[period][key] === '' || sym[period][key] === undefined
-            ? '—'
-            : sym[period][key] + '/10';
-        lbl.append(text, v);
-        const blank = document.createElement('option');
-        blank.value = '';
-        blank.textContent = 'Não informado';
-        sel.append(blank);
-        for (let i = 0; i <= 10; i++) {
-          const o = document.createElement('option');
-          o.value = String(i);
-          o.textContent = String(i);
-          sel.append(o);
-        }
-        sel.value = String(sym[period][key] ?? '');
-        sel.addEventListener('change', () => {
-          sym[period][key] = sel.value;
-          v.textContent = sel.value === '' ? '—' : sel.value + '/10';
-          save();
-          renderCalendar();
-          if (!$('analysisBody').hidden) renderSymptomAnalysis();
-          symptomsStatus(
-            'Atualizado para ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.',
-          );
-        });
-        row.append(lbl, sel);
-        box.append(row);
-      }
+  // Feedback pós-treino: aparece quando todas as séries da sessão estão concluídas
+  // (ou quando já existe um feedback salvo para a data).
+  let feedbackSeen = { date: null, visible: false };
+  function renderFeedback() {
+    const session = current(),
+      section = $('feedbackSection'),
+      text = $('feedbackText');
+    const value = String(session.feedback || '');
+    const visible = sessionComplete(session) || !!value.trim();
+    const justCompleted =
+      visible && feedbackSeen.date === sessionDate && !feedbackSeen.visible && !value.trim();
+    section.hidden = !visible;
+    if (text.value !== value) text.value = value;
+    $('feedbackCount').textContent = text.value.length + '/' + FEEDBACK_MAX;
+    $('feedbackHint').textContent = value.trim() ? 'registrado' : 'opcional';
+    $('feedbackStatus').textContent = value.trim()
+      ? 'Salvo para ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.'
+      : 'Salvo automaticamente.';
+    feedbackSeen = { date: sessionDate, visible };
+    if (justCompleted) {
+      $('feedbackToggle').setAttribute('aria-expanded', 'true');
+      $('feedbackBody').hidden = false;
+      toast('Treino concluído! Deixe seu feedback.');
+      section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    symptomsStatus(
-      'Registro da sessão de ' + parseDate(sessionDate).toLocaleDateString('pt-BR') + '.',
-    );
-  }
-  // Os sintomas ficam em duas seções (antes e depois); ambas mostram o status.
-  function symptomsStatus(text) {
-    document.querySelectorAll('[data-symptoms-status]').forEach((el) => (el.textContent = text));
   }
   function numberLoad(value) {
     const raw = String(value || '')
@@ -1293,8 +1274,7 @@
     'rest',
     'calendar',
     'history',
-    'symBefore',
-    'symAfter',
+    'feedback',
   ]) {
     $(id + 'Toggle').addEventListener('click', () => {
       const btn = $(id + 'Toggle'),
@@ -1305,13 +1285,22 @@
       if (!expanded) {
         if (id === 'calendar') renderCalendar();
         if (id === 'history') renderChart();
-        if (id === 'symBefore' || id === 'symAfter') renderSymptoms();
         if (id === 'custom' || id === 'rest') renderConfig();
         if (id === 'days') renderDayOptions();
         if (id === 'appearance') renderAppearance();
       }
     });
   }
+  $('feedbackText').addEventListener('input', (e) => {
+    const value = e.target.value.slice(0, FEEDBACK_MAX);
+    current().feedback = value;
+    save();
+    $('feedbackCount').textContent = value.length + '/' + FEEDBACK_MAX;
+    $('feedbackHint').textContent = value.trim() ? 'registrado' : 'opcional';
+    $('feedbackStatus').textContent = 'Salvo automaticamente.';
+  });
+  // Registros antigos de sintomas: a análise só aparece se houver algum.
+  $('analysisSection').hidden = !Object.values(app.sessions).some(hasSymptoms);
   for (const [id, key] of [
     ['colorAccent', 'accent'],
     ['colorBackground', 'background'],
@@ -1390,17 +1379,19 @@
             .join('; '),
       ),
     );
-    for (const [period, label] of [
-      ['before', 'Antes'],
-      ['after', 'Depois'],
-    ])
-      lines.push(
-        label +
-          ': ' +
-          metrics
-            .map(([key, name]) => name + ' ' + (sess.symptoms[period]?.[key] ?? '—'))
-            .join(', '),
-      );
+    if (hasSymptoms(sess))
+      for (const [period, label] of [
+        ['before', 'Sintomas antes'],
+        ['after', 'Sintomas depois'],
+      ])
+        lines.push(
+          label +
+            ': ' +
+            metrics
+              .map(([key, name]) => name + ' ' + (sess.symptoms[period]?.[key] ?? '—'))
+              .join(', '),
+        );
+    if (String(sess.feedback || '').trim()) lines.push('Feedback: ' + sess.feedback.trim());
     const txt = lines.join('\n');
     try {
       await navigator.clipboard.writeText(txt);
@@ -1832,6 +1823,7 @@
         'Peso depois',
         'Cansaço antes',
         'Cansaço depois',
+        'Feedback do treino',
       ],
     ];
     for (const [date, s] of Object.entries(app.sessions).sort(([a], [b]) => a.localeCompare(b))) {
@@ -1850,6 +1842,7 @@
               s.symptoms?.before?.[k] ?? '',
               s.symptoms?.after?.[k] ?? '',
             ]),
+            s.feedback || '',
           ]),
         );
     }
@@ -1968,7 +1961,6 @@
   renderDayOptions();
   renderConfig();
   renderCalendar();
-  renderSymptoms();
   renderChart();
 })();
 
