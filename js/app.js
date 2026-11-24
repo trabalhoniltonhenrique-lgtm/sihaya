@@ -1360,42 +1360,64 @@
       toast('Séries reiniciadas.');
     }
   });
-  $('copy').addEventListener('click', async () => {
+  // Resumo legível do treino da data selecionada, para enviar por mensagem.
+  function shareText() {
     const sess = current(),
-      lines = [
-        `Treino de ${sess.workoutName || app.dayTitles[day]} — ${weekNames[day]} (${parseDate(sessionDate).toLocaleDateString('pt-BR')})`,
-        `Intervalos rápidos: ${app.restQuick.join(' / ')} segundos`,
-        '',
-      ];
-    sess.exercises.forEach((ex) =>
-      lines.push(
-        ex.name +
-          ` (${ex.rest} s descanso): ` +
-          ex.sets
-            .map(
-              (s, n) =>
-                `série ${n + 1}: ${s.done ? 'concluída' : 'pendente'} | ${s.load || '—'} kg | ${s.reps || '—'} reps`,
-            )
-            .join('; '),
-      ),
+      total = totalSets(sess),
+      completed = countDone(sess),
+      date = parseDate(sessionDate).toLocaleDateString('pt-BR');
+    const lines = [`🏋️ ${sess.workoutName || app.dayTitles[day]} — ${weekNames[day]}, ${date}`];
+    lines.push(
+      total && completed === total
+        ? `✅ Treino completo · ${total} de ${total} séries`
+        : `✅ ${completed} de ${total} séries (${total ? Math.round((completed / total) * 100) : 0}%)`,
     );
-    if (hasSymptoms(sess))
-      for (const [period, label] of [
-        ['before', 'Sintomas antes'],
-        ['after', 'Sintomas depois'],
-      ])
-        lines.push(
-          label +
-            ': ' +
-            metrics
-              .map(([key, name]) => name + ' ' + (sess.symptoms[period]?.[key] ?? '—'))
-              .join(', '),
-        );
-    if (String(sess.feedback || '').trim()) lines.push('Feedback: ' + sess.feedback.trim());
-    const txt = lines.join('\n');
+    lines.push('');
+    const load = (v) => {
+      const t = String(v || '').trim();
+      return t && numberLoad(t) !== null && !/kg/i.test(t) ? t + ' kg' : t;
+    };
+    for (const ex of sess.exercises) {
+      const done = ex.sets.filter((st) => st.done);
+      if (!done.length) {
+        lines.push(`${ex.name}: não feito`);
+        continue;
+      }
+      // Séries com carga/repetições anotadas aparecem uma a uma; as demais são contadas.
+      const noted = [];
+      let bare = 0;
+      for (const st of done) {
+        const l = load(st.load),
+          r = String(st.reps || '').trim();
+        if (l || r) noted.push(l && r ? `${l} × ${r}` : l || r + ' reps');
+        else bare++;
+      }
+      let detail = noted.join(' · ');
+      if (bare)
+        detail += noted.length
+          ? ` + ${bare} sem anotação`
+          : `${bare} ${bare === 1 ? 'série' : 'séries'}`;
+      const partial = done.length < ex.sets.length ? ` (${done.length} de ${ex.sets.length} séries)` : '';
+      lines.push(`${ex.name}: ${detail}${partial}`);
+    }
+    if (hasSymptoms(sess)) {
+      const pairs = metrics
+        .map(([key, name]) => {
+          const a = sess.symptoms.before?.[key],
+            b = sess.symptoms.after?.[key];
+          return a || b ? `${name} ${a || '—'} → ${b || '—'}` : '';
+        })
+        .filter(Boolean);
+      if (pairs.length) lines.push('', '🩺 Sintomas (antes → depois): ' + pairs.join(', '));
+    }
+    const fb = String(sess.feedback || '').trim();
+    if (fb) lines.push('', '💬 ' + fb);
+    return lines.join('\n');
+  }
+  async function copyText(txt) {
     try {
       await navigator.clipboard.writeText(txt);
-      toast('Registro copiado.');
+      return true;
     } catch (e) {
       const a = document.createElement('textarea');
       a.value = txt;
@@ -1406,8 +1428,23 @@
         ok = document.execCommand('copy');
       } catch (e) {}
       a.remove();
-      toast(ok ? 'Registro copiado.' : 'Cópia bloqueada pelo navegador.');
+      return ok;
     }
+  }
+  // No celular abre o menu de compartilhamento do sistema (WhatsApp, e-mail...).
+  // No computador, ou se o compartilhamento não existir, copia o texto.
+  $('copy').addEventListener('click', async () => {
+    const txt = shareText();
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    if (touch && navigator.share) {
+      try {
+        await navigator.share({ title: 'Meu treino — SIHAYA', text: txt });
+        return;
+      } catch (e) {
+        if (e?.name === 'AbortError') return; // a pessoa fechou o menu
+      }
+    }
+    toast((await copyText(txt)) ? 'Treino copiado. Cole onde quiser.' : 'Cópia bloqueada pelo navegador.');
   });
   function clock() {
     $('clock').textContent =
