@@ -1711,10 +1711,6 @@ body.sihaya-welcome {
   background: linear-gradient(115deg, #bd69e8, #7b23b8);
   box-shadow: 0 8px 22px #a44cda3d;
 }
-.welcome-actions .continue {
-  color: #7929b4;
-  background: #f0e2fb;
-}
 .welcome-note {
   font-size: 12px !important;
   margin-top: 8px;

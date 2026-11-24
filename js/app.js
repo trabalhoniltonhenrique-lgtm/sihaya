@@ -169,8 +169,18 @@
     if (['segunda', 'sexta'].includes(s.day) && s.workoutName === 'Pernas')
       s.workoutName = 'Inferiores';
   let theme = app.theme === 'dark' ? 'dark' : 'light';
-  let day = app.activeDays[0],
-    sessionDate = dateOfCurrentWeek(day),
+  // Ao abrir: o treino de hoje; se hoje não for dia de treino, o próximo dia programado.
+  function openingDate() {
+    const x = new Date();
+    for (let i = 0; i < 7; i++) {
+      const date = iso(x);
+      if (app.activeDays.includes(weekdayOf(date))) return date;
+      x.setDate(x.getDate() + 1);
+    }
+    return dateOfCurrentWeek(app.activeDays[0]);
+  }
+  let sessionDate = openingDate(),
+    day = weekdayOf(sessionDate),
     remaining = 60,
     timer = null,
     last = 0,
@@ -2016,7 +2026,6 @@
     document.body.classList.add('sihaya-welcome');
   }
   document.getElementById('enterApp').addEventListener('click', openApp);
-  document.getElementById('continueApp').addEventListener('click', openApp);
   document.getElementById('homeButton').addEventListener('click', showHome);
 
   // Tela de Configurações gerais. Usa o histórico do navegador para que o
