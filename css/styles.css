@@ -1675,10 +1675,16 @@ body.sihaya-welcome {
   transform: rotate(15deg);
 }
 .welcome-logo {
-  width: min(74%, 265px);
+  width: min(44%, 176px);
   height: auto;
-  object-fit: contain;
-  mix-blend-mode: multiply;
+}
+.welcome-shell .welcome-brand {
+  margin: -4px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  color: #5e35a0;
 }
 .welcome-shell h1 {
   font-size: clamp(24px, 6vw, 32px);
@@ -1806,7 +1812,7 @@ body.sihaya-welcome {
     padding: 28px 18px;
   }
   .welcome-logo {
-    width: 65%;
+    width: min(42%, 150px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

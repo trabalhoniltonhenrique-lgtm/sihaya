@@ -10,9 +10,12 @@ const FILES = [
   './js/app.js',
   './js/drive-sync.js',
   './manifest.webmanifest',
-  './logo-sihaya.png',
+  './logo.svg',
   './icon-192.png',
   './icon-512.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png',
+  './apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (e) =>

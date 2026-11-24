@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">SIHAYA</title>
+  <!-- Anilha (disco de peso): borda grossa, face em relevo e o S de SIHAYA -->
+  <circle cx="256" cy="256" r="236" fill="#5E35A0"/>
+  <circle cx="256" cy="256" r="192" fill="#8052C6"/>
+  <circle cx="256" cy="256" r="214" fill="none" stroke="#7446BA" stroke-width="6"/>
+  <circle cx="256" cy="256" r="186" fill="none" stroke="#9B72DB" stroke-width="4"/>
+  <path d="M322 178 C296 150 204 148 202 208 C200 252 312 260 310 306 C308 366 216 364 190 334"
+        fill="none" stroke="#FFFFFF" stroke-width="42" stroke-linecap="round"/>
+</svg>
