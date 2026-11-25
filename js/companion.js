@@ -385,6 +385,10 @@
   async function pushSync(manual = false) {
     const status = $('rmPushStatus');
     try {
+      if (!('Notification' in self) || !('PushManager' in self))
+        throw Error(
+          'no iPhone, abra o SIHAYA pelo ícone da Tela de Início (Safari → Compartilhar → Adicionar à Tela de Início). Dentro do navegador o iOS não permite notificações.',
+        );
       if (Notification.permission !== 'granted') throw Error('Permita as notificações primeiro.');
       const reg = await navigator.serviceWorker.ready;
       const { publicKey } = await pushRequest('/vapid');
