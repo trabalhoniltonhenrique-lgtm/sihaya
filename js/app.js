@@ -4,6 +4,9 @@
   const $ = (id) => document.getElementById(id),
     pad = (n) => String(n).padStart(2, '0');
   const FEEDBACK_MAX = 1000;
+  // Eventos para o companheiro (Brolaith): sihaya:set-done, exercise-done, workout-done...
+  const emit = (name, detail = {}) =>
+    window.dispatchEvent(new CustomEvent('sihaya:' + name, { detail }));
   const iso = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   const parseDate = (s) => {
     const [y, m, d] = s.split('-').map(Number);
@@ -535,6 +538,7 @@
     renderCalendar();
     renderConfig();
     renderChart();
+    emit('session-changed');
   }
   function selectDay(d) {
     if (transitioning) return;
@@ -917,8 +921,15 @@
             return;
           }
           const before = stage(ex) === 'done';
+          const sessionBefore = sessionComplete(current());
           set.done = checkbox.checked;
           commit();
+          if (checkbox.checked) {
+            if (sessionComplete(current()) && !sessionBefore)
+              emit('workout-done', { workout: current().workoutName || app.dayTitles[day] });
+            else if (!before && stage(ex) === 'done') emit('exercise-done', { exercise: ex.name });
+            else emit('set-done', { exercise: ex.name });
+          }
           if (!before && stage(ex) === 'done') dissolveCard(article, () => render());
           else render();
         });
@@ -1251,6 +1262,7 @@
     const est = el('div', 'level-estimate');
     if (lp.ready) {
       $('levelHint').textContent = 'pronto para subir';
+      emit('level-ready', { level: lp.nextProg.name });
       est.classList.add('level-ready');
       est.append(el('p', '', `Você cumpriu os critérios do nível ${lp.nextProg.name}!`));
       const btn = el('button', 'manage-btn primary', `Ver programa ${lp.nextProg.name}`);
@@ -1552,6 +1564,9 @@
     $('feedbackCount').textContent = value.length + '/' + FEEDBACK_MAX;
     $('feedbackHint').textContent = value.trim() ? 'registrado' : 'opcional';
     $('feedbackStatus').textContent = 'Salvo automaticamente.';
+  });
+  $('feedbackText').addEventListener('change', (e) => {
+    if (e.target.value.trim()) emit('feedback-saved');
   });
   // Registros antigos de sintomas: a análise só aparece se houver algum.
   $('analysisSection').hidden = !Object.values(app.sessions).some(hasSymptoms);
@@ -2243,6 +2258,23 @@
   $('exportSessionsCsv').addEventListener('click', exportAllCsv);
   $('exportBackup').addEventListener('click', exportBackup);
   $('importBackup').addEventListener('change', (e) => importBackup(e.target.files?.[0]));
+
+  // Interface para o módulo do companheiro (js/companion.js).
+  self.SIHAYA_CORE = {
+    data: () => app,
+    save,
+    toast,
+    iso,
+    parseDate,
+    today: () => iso(new Date()),
+    sessionDate: () => sessionDate,
+    session: () => current(),
+    workoutName: () => current().workoutName || app.dayTitles[day] || 'Treino',
+    isTrainingDay: () => app.activeDays.includes(weekdayOf(iso(new Date()))),
+    sessionComplete: (s) => sessionComplete(s || current()),
+    levelProgress: () => levelProgress(),
+    weekNames,
+  };
 
   applyTheme();
   save();

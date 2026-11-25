@@ -1,0 +1,35 @@
+SIHAYA — Servidor de notificações (Cloudflare Worker, plano gratuito)
+=====================================================================
+
+Para que serve
+- Envia os lembretes de água e refeições para o iPhone mesmo com o app fechado.
+- O push vai VAZIO: o texto do Brolaith é escolhido no próprio iPhone.
+  Nenhuma fala, dado de saúde ou dieta passa pelo servidor; ele guarda
+  apenas a inscrição de push do aparelho e a lista de horários.
+
+Requisitos no iPhone
+- iOS 16.4 ou mais recente.
+- SIHAYA adicionado à Tela de Início pelo Safari e aberto por lá.
+- Em Configurações → Lembretes: "Permitir notificações".
+
+Publicar o servidor (uma vez)
+1. Criar conta gratuita em https://dash.cloudflare.com/sign-up
+2. Na pasta do projeto:
+     npx wrangler login                      (autorize no navegador)
+     cd server
+     npx wrangler kv namespace create SUBS   (copie o id para wrangler.toml)
+     node gen-keys.mjs > keys.local.json     (NÃO enviar ao GitHub)
+     npx wrangler secret put ACCESS_KEY          (valor de keys.local.json)
+     npx wrangler secret put VAPID_PUBLIC        (idem)
+     npx wrangler secret put VAPID_PRIVATE_JWK   (idem)
+     npx wrangler deploy
+3. Anote o endereço publicado (https://sihaya-push.<conta>.workers.dev).
+
+Conectar o iPhone
+- Configurações → Lembretes → Servidor de notificações:
+  endereço do servidor + chave de acesso (ACCESS_KEY) →
+  "Conectar e enviar horários" → "Enviar teste".
+- Ao mudar horários de água ou refeições, o app reenvia sozinho.
+
+Custos e limites
+- Plano gratuito: cron a cada minuto e KV bastam para uma pessoa.

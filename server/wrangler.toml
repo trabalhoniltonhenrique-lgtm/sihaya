@@ -1,0 +1,16 @@
+name = "sihaya-push"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Verifica os lembretes a cada minuto.
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+VAPID_SUBJECT = "https://trabalhoniltonhenrique-lgtm.github.io/sihaya/"
+ALLOWED_ORIGINS = "https://trabalhoniltonhenrique-lgtm.github.io,http://localhost:4317"
+
+# Preenchido depois de: npx wrangler kv namespace create SUBS
+[[kv_namespaces]]
+binding = "SUBS"
+id = "PREENCHER_COM_O_ID_DO_KV"

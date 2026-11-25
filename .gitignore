@@ -12,3 +12,8 @@ desktop.ini
 .DS_Store
 .vscode/
 node_modules/
+
+# Servidor de notificações: segredos locais
+server/keys.local.json
+server/.dev.vars
+server/.wrangler/
