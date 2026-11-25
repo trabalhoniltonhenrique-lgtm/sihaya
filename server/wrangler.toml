@@ -1,6 +1,8 @@
 name = "sihaya-push"
 main = "worker.js"
 compatibility_date = "2025-01-01"
+workers_dev = true
+preview_urls = false
 
 # Verifica os lembretes a cada minuto.
 [triggers]
@@ -13,4 +15,4 @@ ALLOWED_ORIGINS = "https://trabalhoniltonhenrique-lgtm.github.io,http://localhos
 # Preenchido depois de: npx wrangler kv namespace create SUBS
 [[kv_namespaces]]
 binding = "SUBS"
-id = "PREENCHER_COM_O_ID_DO_KV"
+id = "22b947cd6cbb476c8eee24bd31cc6945"

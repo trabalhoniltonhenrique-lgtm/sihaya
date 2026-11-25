@@ -7,7 +7,7 @@
 // Variável comum (wrangler.toml): VAPID_SUBJECT, ALLOWED_ORIGINS. KV: SUBS.
 
 const json = (data, status = 200, origin = '*') =>
-  new Response(JSON.stringify(data), {
+  new Response(status === 204 ? null : JSON.stringify(data), {
     status,
     headers: {
       'content-type': 'application/json',
