@@ -7,6 +7,7 @@ const FILES = [
   './index.html',
   './css/styles.css',
   './js/version.js',
+  './js/programs.js',
   './js/app.js',
   './js/drive-sync.js',
   './manifest.webmanifest',

@@ -151,11 +151,26 @@
         <span id="legNote"
           >Leg press: somente a resistência da própria máquina. No campo de carga, registre o peso
           em kg ou escreva “sem anilhas”. </span
-        >Cada data tem seu próprio registro de cargas, repetições, séries e sintomas. Os dados ficam
+        >Cada data tem seu próprio registro de cargas, repetições, séries e feedback. Os dados ficam
         salvos localmente neste navegador; em Configurações você encontra o backup e a sincronização.
       </p>
 
       <h2 class="screen-group">Histórico e evolução</h2>
+      <section class="panel feature" id="levelSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="levelToggle"
+          aria-expanded="false"
+          aria-controls="levelBody"
+        >
+          <span class="toggle-label"
+            >Seu nível <span class="toggle-hint" id="levelHint"></span
+          ></span>
+          <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="levelBody" hidden></div>
+      </section>
       <section class="panel feature">
         <button
           type="button"
@@ -308,6 +323,30 @@
       </header>
 
       <h2 class="settings-group">Treino</h2>
+      <section class="panel feature" id="programSection">
+        <button
+          type="button"
+          class="section-toggle"
+          id="programToggle"
+          aria-expanded="false"
+          aria-controls="programBody"
+        >
+          Nível e programa <span class="chevron">⌄</span>
+        </button>
+        <div class="feature-body" id="programBody" hidden>
+          <p class="feature-description">
+            Escolha seu nível para aplicar o programa de treino correspondente. Quando você cumprir
+            os critérios do próximo nível, o app avisa em "Seu nível".
+          </p>
+          <div class="program-options" id="programOptions"></div>
+          <p class="program-note">
+            Programas de baixo impacto pensados para lipedema: aeróbico leve no início e
+            panturrilha em todos os treinos, sem saltos ou corrida. Use a compressão indicada,
+            hidrate-se e prefira terminar sem dor. Natação e hidroginástica são ótimos
+            complementos. Confirme o programa com seu médico ou fisioterapeuta.
+          </p>
+        </div>
+      </section>
       <div class="manage-row day-manage">
         <span class="small" id="daySummary">Organize sua semana.</span
         ><button class="manage-btn" id="addDay" type="button">+ Adicionar dia</button>
@@ -628,6 +667,7 @@
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="./js/version.js"></script>
+    <script src="./js/programs.js"></script>
     <script src="./js/app.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="./js/drive-sync.js"></script>

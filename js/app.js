@@ -47,10 +47,23 @@
     ['Rosca bíceps na máquina ou halteres leves', '12–15'],
     ['Tríceps pulley (barra ou corda)', '12–15'],
   ];
+  // Programas por nível (js/programs.js). Sem eles, usa as listas antigas.
+  const PROGRAMS = self.SIHAYA_PROGRAMS || {},
+    LEVELS = self.SIHAYA_LEVEL_ORDER || [];
+  const programTemplate = (level, d) =>
+    (PROGRAMS[level]?.days?.[d]?.exercises || []).map(([name, reps, count, rest], i) => ({
+      id: `${level}-${d}-${i}`,
+      name,
+      reps,
+      count,
+      rest,
+    }));
   const defaultConfig = (d) =>
-    (d === 'quarta' ? upperExercises : defaults.includes(d) ? legExercises : []).map(
-      ([name, reps], i) => ({ id: d + '-' + i, name, reps, count: 2, rest: 75 }),
-    );
+    PROGRAMS.iniciante
+      ? programTemplate('iniciante', d)
+      : (d === 'quarta' ? upperExercises : defaults.includes(d) ? legExercises : []).map(
+          ([name, reps], i) => ({ id: d + '-' + i, name, reps, count: 2, rest: 75 }),
+        );
   const newKey = 'kanban-lavanda-semanal-v3',
     oldKey = 'kanban-pernas-v2';
   const emptySet = () => ({ done: false, load: '', reps: '' });
@@ -114,7 +127,7 @@
     templates: {},
     restQuick: [60, 90],
     activeDays: [...defaults],
-    dayTitles: { segunda: 'Inferiores', quarta: 'Superiores', sexta: 'Inferiores' },
+    dayTitles: {},
   };
   let oldData = null;
   try {
@@ -134,7 +147,8 @@
   for (const d of allDays)
     if (!app.dayTitles[d])
       app.dayTitles[d] =
-        d === 'quarta' ? 'Superiores' : defaults.includes(d) ? 'Inferiores' : 'Treino';
+        PROGRAMS.iniciante?.days?.[d]?.title ||
+        (d === 'quarta' ? 'Superiores' : defaults.includes(d) ? 'Inferiores' : 'Treino');
   for (const d of allDays) {
     const list = app.templates?.[d];
     app.templates[d] = Array.isArray(list)
@@ -168,6 +182,12 @@
   for (const s of Object.values(app.sessions))
     if (['segunda', 'sexta'].includes(s.day) && s.workoutName === 'Pernas')
       s.workoutName = 'Inferiores';
+  // Nível: quem já usava o app começa como Iniciante, contando desde o primeiro registro.
+  if (!app.level || !PROGRAMS[app.level.id] || !/^\d{4}-\d\d-\d\d$/.test(app.level.since || ''))
+    app.level = {
+      id: PROGRAMS[app.level?.id] ? app.level.id : 'iniciante',
+      since: Object.keys(app.sessions).sort()[0] || iso(new Date()),
+    };
   let theme = app.theme === 'dark' ? 'dark' : 'light';
   // Ao abrir: o treino de hoje; se hoje não for dia de treino, o próximo dia programado.
   function openingDate() {
@@ -801,10 +821,13 @@
     let pending = 0,
       finished = 0;
     $('workoutTitle').textContent = current().workoutName || app.dayTitles[day] || 'Treino';
-    $('legNote').hidden = !(day === 'segunda' || day === 'sexta');
+    // Aviso do leg press sem anilhas: só no nível Iniciante, nos dias que têm leg press.
+    $('legNote').hidden = !(
+      app.level.id === 'iniciante' && session.exercises.some((x) => /leg press/i.test(x.name))
+    );
     $('sessionDate').value = sessionDate;
     $('workoutIntro').textContent =
-      `Adaptação · ${session.exercises.length} exercícios · ${total} séries`;
+      `${PROGRAMS[app.level.id]?.name || "Treino"} · ${session.exercises.length} exercícios · ${total} séries`;
     for (const ex of session.exercises) {
       const status = stage(ex);
       if (status === 'done') finished++;
@@ -938,6 +961,7 @@
     $('progressBar').setAttribute('aria-valuenow', completed);
     renderDays();
     renderFeedback();
+    renderLevel();
   }
   function renderConfig() {
     const box = $('exerciseOptions');
@@ -1121,6 +1145,224 @@
       section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
+  // ---------- Níveis e progressão ----------
+  // Critério para subir: treinos completos + aumento de carga desde o início do nível.
+  function levelProgress() {
+    const prog = PROGRAMS[app.level.id],
+      next = prog?.next || null,
+      since = app.level.since;
+    const entries = Object.entries(app.sessions)
+      .filter(([date]) => date >= since)
+      .sort(([a], [b]) => a.localeCompare(b));
+    const done = entries.filter(([, s]) => sessionComplete(s)).length;
+    // Carga: maior carga numérica de cada exercício na primeira e na última sessão anotada.
+    const loads = new Map();
+    for (const [, s] of entries)
+      for (const ex of s.exercises) {
+        const vals = ex.sets.map((st) => numberLoad(st.load)).filter((v) => v !== null);
+        if (!vals.length) continue;
+        const max = Math.max(...vals),
+          key = ex.name.trim().toLowerCase(),
+          item = loads.get(key);
+        if (item) item.last = max;
+        else loads.set(key, { name: ex.name, first: max, last: max });
+      }
+    const increased = [...loads.values()].filter((x) => x.last > x.first);
+    // Ritmo: treinos completos nas últimas 4 semanas; sem histórico, os dias programados.
+    const from = new Date();
+    from.setDate(from.getDate() - 27);
+    const fromIso = iso(from),
+      today = iso(new Date());
+    const recent = Object.entries(app.sessions).filter(
+      ([date, s]) => date >= fromIso && date <= today && sessionComplete(s),
+    ).length;
+    const perWeek = recent ? recent / 4 : app.activeDays.length;
+    const missingWorkouts = next ? Math.max(0, next.workouts - done) : 0,
+      missingLoads = next ? Math.max(0, next.loadIncreases - increased.length) : 0;
+    return {
+      prog,
+      next,
+      nextProg: next ? PROGRAMS[next.level] : null,
+      done,
+      increased,
+      perWeek,
+      measured: !!recent,
+      missingWorkouts,
+      missingLoads,
+      weeks: missingWorkouts ? Math.ceil(missingWorkouts / perWeek) : 0,
+      ready: !!next && !missingWorkouts && !missingLoads,
+    };
+  }
+  function weeksText(w) {
+    if (w <= 1) return '≈ 1 semana';
+    if (w < 9) return `≈ ${w} semanas`;
+    return `≈ ${Math.round(w / 4.35)} meses`;
+  }
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+  function meter(label, value, target) {
+    const row = el('div', 'level-meter');
+    const top = el('div', 'level-meter-top');
+    top.append(el('span', '', label), el('b', '', `${Math.min(value, target)} de ${target}`));
+    const track = el('div', 'track');
+    track.setAttribute('role', 'progressbar');
+    track.setAttribute('aria-label', label);
+    track.setAttribute('aria-valuemin', '0');
+    track.setAttribute('aria-valuemax', String(target));
+    track.setAttribute('aria-valuenow', String(Math.min(value, target)));
+    const bar = el('div', 'bar');
+    bar.style.width = Math.min(100, (value / target) * 100) + '%';
+    track.append(bar);
+    row.append(top, track);
+    return row;
+  }
+  function openProgramSettings() {
+    $('settingsButton').click();
+    if ($('programToggle').getAttribute('aria-expanded') !== 'true') $('programToggle').click();
+    $('programSection').scrollIntoView({ block: 'start' });
+  }
+  function renderLevel() {
+    const lp = levelProgress();
+    const body = $('levelBody');
+    body.replaceChildren();
+    const since = parseDate(app.level.since).toLocaleDateString('pt-BR');
+    const line = el('p', 'level-line');
+    line.append('Nível atual: ', el('b', '', lp.prog.name), ` · desde ${since}`);
+    body.append(line);
+    if (!lp.next) {
+      $('levelHint').textContent = lp.prog.name;
+      body.append(
+        el(
+          'p',
+          'level-estimate',
+          'Você está no nível mais alto. Mantenha a constância e aumente a carga aos poucos, sempre sem dor.',
+        ),
+      );
+      return renderProgramOptions(lp);
+    }
+    body.append(
+      meter('Treinos completos', lp.done, lp.next.workouts),
+      meter('Exercícios com carga aumentada', lp.increased.length, lp.next.loadIncreases),
+    );
+    const est = el('div', 'level-estimate');
+    if (lp.ready) {
+      $('levelHint').textContent = 'pronto para subir';
+      est.classList.add('level-ready');
+      est.append(el('p', '', `Você cumpriu os critérios do nível ${lp.nextProg.name}!`));
+      const btn = el('button', 'manage-btn primary', `Ver programa ${lp.nextProg.name}`);
+      btn.type = 'button';
+      btn.addEventListener('click', openProgramSettings);
+      est.append(btn);
+    } else if (lp.missingWorkouts) {
+      $('levelHint').textContent = `${lp.nextProg.name} em ${weeksText(lp.weeks)}`;
+      const p1 = el('p');
+      p1.append(`Tempo estimado até o nível ${lp.nextProg.name}: `, el('b', '', weeksText(lp.weeks)));
+      const rate = lp.perWeek.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+      const p2 = el(
+        'p',
+        'small',
+        lp.measured
+          ? `No seu ritmo de ${rate} ${lp.perWeek === 1 ? 'treino completo' : 'treinos completos'} por semana (últimas 4 semanas).`
+          : `Considerando os ${app.activeDays.length} dias programados por semana.`,
+      );
+      est.append(p1, p2);
+      if (lp.missingLoads)
+        est.append(
+          el(
+            'p',
+            'small',
+            `Também falta aumentar a carga em ${lp.missingLoads} ${lp.missingLoads === 1 ? 'exercício' : 'exercícios'}.`,
+          ),
+        );
+    } else {
+      $('levelHint').textContent = 'falta aumentar carga';
+      est.append(
+        el(
+          'p',
+          '',
+          `Falta aumentar a carga em ${lp.missingLoads} ${lp.missingLoads === 1 ? 'exercício' : 'exercícios'} para chegar ao nível ${lp.nextProg.name}.`,
+        ),
+        el(
+          'p',
+          'small',
+          'Anote as cargas e aumente um pouco quando completar as repetições com folga e sem dor.',
+        ),
+      );
+    }
+    body.append(
+      est,
+      el(
+        'p',
+        'meta-line',
+        `Critérios para ${lp.nextProg.name}: ${lp.next.workouts} treinos completos e carga maior em ${lp.next.loadIncreases} exercícios desde o início do nível.`,
+      ),
+    );
+    renderProgramOptions(lp);
+  }
+  function renderProgramOptions(lp) {
+    const box = $('programOptions');
+    box.replaceChildren();
+    for (const id of LEVELS) {
+      const prog = PROGRAMS[id];
+      if (!prog) continue;
+      const current = id === app.level.id;
+      const card = el('div', 'program-card' + (current ? ' current' : ''));
+      const head = el('div', 'program-head');
+      head.append(el('strong', '', prog.name));
+      if (current) head.append(el('span', 'status', 'Atual'));
+      else if (lp.ready && lp.next?.level === id) head.append(el('span', 'status done', 'Recomendado'));
+      const days = Object.entries(prog.days)
+        .map(([d, v]) => weekNames[d].slice(0, 3) + ' · ' + v.title)
+        .join(', ');
+      const btn = el('button', current ? '' : 'primary', current ? 'Restaurar programa' : 'Aplicar programa');
+      btn.type = 'button';
+      btn.addEventListener('click', () => applyProgram(id));
+      card.append(
+        head,
+        el('div', 'small', prog.summary),
+        el('p', 'program-focus', prog.focus),
+        el('div', 'program-days', days),
+        btn,
+      );
+      box.append(card);
+    }
+  }
+  function applyProgram(id) {
+    const prog = PROGRAMS[id];
+    if (!prog || transitioning) return;
+    const same = id === app.level.id;
+    const ok = confirm(
+      same
+        ? `Restaurar o programa ${prog.name}? Os dias e exercícios programados voltam ao original deste nível. Seus registros anteriores ficam guardados.`
+        : `Mudar para o nível ${prog.name}? Os dias e exercícios programados serão trocados pelo programa ${prog.name} a partir de hoje. Seus registros anteriores ficam guardados.`,
+    );
+    if (!ok) return;
+    const days = Object.keys(prog.days).sort((a, b) => dayOffsets[a] - dayOffsets[b]);
+    for (const d of allDays) app.templates[d] = programTemplate(id, d);
+    app.activeDays = days;
+    for (const d of days) app.dayTitles[d] = prog.days[d].title;
+    if (!same) app.level = { id, since: iso(new Date()) };
+    // Sessões de hoje em diante ainda sem registro são recriadas com o programa novo.
+    const today = iso(new Date());
+    for (const [date, s] of Object.entries(app.sessions))
+      if (date >= today && !recordedSession(s)) delete app.sessions[date];
+    sessionDate = openingDate();
+    day = weekdayOf(sessionDate);
+    chartDay = app.activeDays[0];
+    chartEx = '';
+    save();
+    renderDays();
+    render();
+    renderDayOptions();
+    renderConfig();
+    renderCalendar();
+    renderChart();
+    toast(same ? 'Programa restaurado.' : `Nível ${prog.name} aplicado.`);
+  }
   function numberLoad(value) {
     const raw = String(value || '')
       .replace(',', '.')
@@ -1285,6 +1527,8 @@
     'calendar',
     'history',
     'feedback',
+    'level',
+    'program',
   ]) {
     $(id + 'Toggle').addEventListener('click', () => {
       const btn = $(id + 'Toggle'),

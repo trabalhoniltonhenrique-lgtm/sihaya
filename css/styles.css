@@ -2058,3 +2058,106 @@ html[data-theme='dark'] .date-pill input {
     justify-content: flex-end;
   }
 }
+
+/* Seu nível: medidores e estimativa */
+.level-line {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+.level-meter {
+  margin: 0 0 12px;
+}
+.level-meter-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--sub);
+}
+.level-meter-top b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.level-meter .track {
+  height: 8px;
+  margin-top: 6px;
+}
+.level-estimate {
+  margin: 14px 0 6px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+}
+.level-estimate p {
+  margin: 0;
+}
+.level-estimate p + p {
+  margin-top: 5px;
+}
+.level-estimate b {
+  color: var(--purple);
+}
+.level-ready {
+  border-color: var(--purple2);
+}
+.level-ready .manage-btn {
+  margin-top: 10px;
+}
+
+/* Nível e programa (Configurações) */
+.program-options {
+  display: grid;
+  gap: 10px;
+}
+.program-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.program-card.current {
+  border-color: var(--purple2);
+  background: var(--soft);
+}
+.program-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.program-focus {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+.program-days {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.5;
+}
+.program-card button {
+  justify-self: start;
+  margin-top: 4px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--purple);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+}
+.program-card button.primary {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: var(--button-ink, #fff);
+}
+.program-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sub);
+}
