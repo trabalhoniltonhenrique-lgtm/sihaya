@@ -2489,3 +2489,16 @@ html[data-theme='dark'] .speech strong {
 .liquid-pause[hidden] {
   display: none;
 }
+.sound-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sound-row .check-field {
+  flex: 1 1 220px;
+}
+.sound-row .config-button {
+  margin: 0;
+}

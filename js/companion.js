@@ -75,6 +75,7 @@
       silence: !!c.silence,
       xp: { enabled: c.xp?.enabled ?? true, total: num(c.xp?.total, 0, 1e9, 0) },
       mood: c.mood && c.mood.date ? c.mood : { date: '', value: '' },
+      sound: c.sound ?? true,
       lastSeen: c.lastSeen || '',
       levelNotice: c.levelNotice || '',
     };
@@ -299,6 +300,39 @@
     }
     return line('waterReminder');
   }
+  // Rugido do Brolaith: "CC0 Deep Monster Roar" (trazzz123, OpenGameArt, domínio público),
+  // cortado em 2,2 s. O iOS só libera áudio após um toque; o primeiro toque no app
+  // destrava o som em silêncio. Com o app fechado, o iOS usa o som padrão do sistema.
+  const roar = new Audio('./sounds/brolaith-roar.mp3');
+  roar.preload = 'auto';
+  let soundUnlocked = false;
+  function unlockSound() {
+    if (soundUnlocked) return;
+    soundUnlocked = true;
+    roar.muted = true;
+    roar
+      .play()
+      .then(() => {
+        // Se um rugido de verdade começou nesse meio-tempo (muted=false), não interrompe.
+        if (!roar.muted) return;
+        roar.pause();
+        roar.currentTime = 0;
+        roar.muted = false;
+      })
+      .catch(() => {
+        roar.muted = false;
+        soundUnlocked = false;
+      });
+  }
+  document.addEventListener('pointerdown', unlockSound, { capture: true });
+  function playRoar(force = false) {
+    if (!force && !CMP().sound) return;
+    try {
+      roar.currentTime = 0;
+      roar.muted = false;
+      roar.play().catch(() => {});
+    } catch (e) {}
+  }
   async function notify(body, tag) {
     const reg = await navigator.serviceWorker?.getRegistration?.();
     if (reg && 'Notification' in self && Notification.permission === 'granted')
@@ -326,6 +360,7 @@
       C.save();
       const text = reminderText(item);
       if (CMP().enabled && !CMP().silence) renderLine(text);
+      if (document.visibilityState === 'visible') playRoar();
       if (!r.push.connected && document.visibilityState !== 'visible') notify(text, key);
       else if (!r.push.connected) C.toast(text);
     }
@@ -513,6 +548,8 @@
       CMP().xp.enabled = v;
       renderCompanion();
     });
+    bind('cmpSound', () => CMP().sound, (v) => (CMP().sound = v));
+    $('cmpSoundTest').addEventListener('click', () => playRoar(true));
     const p = A().profile;
     bind('pfHeight', () => p.heightCm, (v) => (p.heightCm = v ? num(v, 100, 230, '') : ''));
     bind('pfWeight', () => p.weightKg, (v) => {

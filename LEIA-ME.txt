@@ -109,3 +109,9 @@ AGENDAMENTO SEMANAL
 - Se o app estiver fechado, sem internet ou sem autorização, o envio ficará pendente até a próxima abertura e conexão.
 - O botão Enviar backup continua disponível a qualquer momento e reinicia a contagem de 7 dias.
 - Não há sincronização de verdade em segundo plano.
+
+
+CRÉDITOS
+- Rugido do Brolaith (sounds/brolaith-roar.mp3): trecho de "CC0 Deep Monster Roar",
+  de trazzz123, OpenGameArt.org — licença CC0 (domínio público).
+  https://opengameart.org/content/cc0-deep-monster-roar
